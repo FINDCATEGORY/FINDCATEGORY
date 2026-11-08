@@ -26,18 +26,6 @@ export const MessagesIcon = () => (
   </div>
 )
 
-export const CalendarIcon = () => {
-  const today = new Date().getDate()
-  return (
-    <div className="w-full h-full rounded-[22%] bg-white flex flex-col overflow-hidden shadow-lg">
-      <div className="h-1/4 bg-gradient-to-b from-red-500 to-red-600" />
-      <div className="flex-1 flex items-center justify-center">
-        <span className="text-3xl md:text-4xl font-bold text-gray-800">{today}</span>
-      </div>
-    </div>
-  )
-}
-
 export const PhotosIcon = () => (
   <div className="w-full h-full rounded-[22%] overflow-hidden">
     <img
@@ -68,41 +56,11 @@ export const NotesIcon = () => (
   </div>
 )
 
-export const VSCodeIcon = () => (
-  <div className="w-full h-full rounded-[22%] bg-[#1e1e1e] flex items-center justify-center overflow-hidden">
-    <img
-      src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-3v8w7AQLA19COX4w3UYNrr8IjY3s2S.png"
-      alt="VS Code"
-      className="w-full h-full object-cover"
-    />
-  </div>
-)
-
 export const TerminalIcon = () => (
   <div className="w-full h-full rounded-[22%] overflow-hidden">
     <img
       src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/terminal-2021-06-03-cP8LONJhjquJOgYKNSOIWIy2pZuqxT.webp"
       alt="Terminal"
-      className="w-full h-full object-cover"
-    />
-  </div>
-)
-
-export const DockerIcon = () => (
-  <div className="w-full h-full rounded-[22%] overflow-hidden">
-    <img
-      src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/docker_macos_bigsur_icon_190231-7zOXNNfnYBISTonAUXcB5M7GL8xaXD.png"
-      alt="Docker"
-      className="w-full h-full object-cover"
-    />
-  </div>
-)
-
-export const GitIcon = () => (
-  <div className="w-full h-full rounded-[22%] overflow-hidden">
-    <img
-      src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/images-paMp389RC6z0xNSQzqWkrJf2znOiY5.png"
-      alt="Git"
       className="w-full h-full object-cover"
     />
   </div>

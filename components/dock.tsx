@@ -8,14 +8,10 @@ import {
   FinderIcon,
   SafariIcon,
   MessagesIcon,
-  CalendarIcon,
   PhotosIcon,
   MusicIcon,
   NotesIcon,
-  VSCodeIcon,
   TerminalIcon,
-  DockerIcon,
-  GitIcon,
   SettingsIcon,
   LaunchpadIcon,
 } from "./app-icons"
@@ -32,14 +28,10 @@ const dockApps = [
   { id: "finder" as AppType, icon: FinderIcon, label: "Finder" },
   { id: "safari" as AppType, icon: SafariIcon, label: "Safari" },
   { id: "messages" as AppType, icon: MessagesIcon, label: "Messages" },
-  { id: "calendar" as AppType, icon: CalendarIcon, label: "Calendar" },
   { id: "photos" as AppType, icon: PhotosIcon, label: "Photos" },
   { id: "music" as AppType, icon: MusicIcon, label: "Music" },
   { id: "notes" as AppType, icon: NotesIcon, label: "Notes" },
-  { id: "vscode" as AppType, icon: VSCodeIcon, label: "VS Code" },
   { id: "terminal" as AppType, icon: TerminalIcon, label: "Terminal" },
-  { id: "docker" as AppType, icon: DockerIcon, label: "Docker" },
-  { id: "git" as AppType, icon: GitIcon, label: "Git Bash" },
   { id: "settings" as AppType, icon: SettingsIcon, label: "Settings" },
 ]
 
@@ -57,57 +49,78 @@ export function Dock({ onAppClick, minimizedWindows, onUnminimize, onLaunchpadCl
       <div className="fixed bottom-2 left-1/2 -translate-x-1/2 z-50">
         <div className="bg-white/30 macos-blur macos-dock-shadow rounded-2xl px-2 py-2 flex items-end gap-1 border border-white/20">
           {/* Launchpad icon */}
-          <button
-            className="relative group transition-transform duration-200 ease-out"
-            style={{
-              transform: hoveredApp === "launchpad" ? "scale(1.2) translateY(-8px)" : "scale(1)",
-            }}
-            onClick={onLaunchpadClick}
-            onMouseEnter={() => setHoveredApp("launchpad")}
-            onMouseLeave={() => setHoveredApp(null)}
-          >
-            <div className="w-14 h-14 rounded-xl shadow-lg overflow-hidden">
-              <LaunchpadIcon />
+          <div className="relative group flex flex-col items-center">
+            {/* macOS Tooltip / 말풍선 */}
+            <div
+              className={`pointer-events-none absolute -top-12 z-50 flex flex-col items-center transition-all duration-150 ease-out ${
+                hoveredApp === "launchpad"
+                  ? "opacity-100 -translate-y-1"
+                  : "opacity-0 translate-y-0"
+              }`}
+            >
+              <div className="whitespace-nowrap rounded-md bg-gray-900/85 px-3 py-1 text-xs font-medium text-white shadow-xl backdrop-blur-md border border-white/10">
+                Launchpad
+              </div>
+              <div className="h-0 w-0 border-x-4 border-t-4 border-x-transparent border-t-gray-900/85" />
             </div>
-            <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-800/90 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-              Launchpad
-            </div>
-          </button>
+
+            <button
+              className="relative transition-transform duration-200 ease-out"
+              style={{
+                transform: hoveredApp === "launchpad" ? "scale(1.2) translateY(-8px)" : "scale(1)",
+              }}
+              onClick={onLaunchpadClick}
+              onMouseEnter={() => setHoveredApp("launchpad")}
+              onMouseLeave={() => setHoveredApp(null)}
+            >
+              <div className="w-14 h-14 rounded-xl shadow-lg overflow-hidden">
+                <LaunchpadIcon />
+              </div>
+            </button>
+          </div>
 
           <div className="w-px h-12 bg-white/30 mx-1" />
 
-          {dockApps.map((app, index) => {
+          {dockApps.map((app) => {
             const isHovered = hoveredApp === app.id
             const isOpen = openApps.includes(app.id)
             const IconComponent = app.icon
 
             return (
-              <button
-                key={app.id}
-                data-app={app.id}
-                className="relative group transition-transform duration-200 ease-out"
-                style={{
-                  transform: isHovered ? "scale(1.2) translateY(-8px)" : "scale(1)",
-                }}
-                onMouseEnter={() => setHoveredApp(app.id)}
-                onMouseLeave={() => setHoveredApp(null)}
-                onClick={() => onAppClick(app.id, app.label)}
-                onContextMenu={(e) => handleContextMenu(e, app.id)}
-              >
-                <div className="w-14 h-14 rounded-xl shadow-lg overflow-hidden">
-                  <IconComponent />
+              <div key={app.id} className="relative group flex flex-col items-center">
+                {/* macOS Tooltip / 말풍선 */}
+                <div
+                  className={`pointer-events-none absolute -top-12 z-50 flex flex-col items-center transition-all duration-150 ease-out ${
+                    isHovered ? "opacity-100 -translate-y-1" : "opacity-0 translate-y-0"
+                  }`}
+                >
+                  <div className="whitespace-nowrap rounded-md bg-gray-900/85 px-3 py-1 text-xs font-medium text-white shadow-xl backdrop-blur-md border border-white/10">
+                    {app.label}
+                  </div>
+                  <div className="h-0 w-0 border-x-4 border-t-4 border-x-transparent border-t-gray-900/85" />
                 </div>
 
-                {/* Tooltip */}
-                <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-800/90 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-                  {app.label}
-                </div>
+                <button
+                  data-app={app.id}
+                  className="relative transition-transform duration-200 ease-out"
+                  style={{
+                    transform: isHovered ? "scale(1.2) translateY(-8px)" : "scale(1)",
+                  }}
+                  onMouseEnter={() => setHoveredApp(app.id)}
+                  onMouseLeave={() => setHoveredApp(null)}
+                  onClick={() => onAppClick(app.id, app.label)}
+                  onContextMenu={(e) => handleContextMenu(e, app.id)}
+                >
+                  <div className="w-14 h-14 rounded-xl shadow-lg overflow-hidden">
+                    <IconComponent />
+                  </div>
 
-                {/* Running indicator */}
-                {isOpen && (
-                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-gray-700 rounded-full" />
-                )}
-              </button>
+                  {/* Running indicator */}
+                  {isOpen && (
+                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-gray-700 rounded-full" />
+                  )}
+                </button>
+              </div>
             )
           })}
 
@@ -115,15 +128,37 @@ export function Dock({ onAppClick, minimizedWindows, onUnminimize, onLaunchpadCl
           {minimizedWindows.length > 0 && <div className="w-px h-12 bg-white/30 mx-1" />}
 
           {/* Minimized windows */}
-          {minimizedWindows.map((window) => (
-            <button
-              key={window.id}
-              className="w-14 h-14 rounded-xl bg-white/50 flex items-center justify-center text-2xl shadow-lg hover:scale-110 transition-transform"
-              onClick={() => onUnminimize(window.id)}
-            >
-              📄
-            </button>
-          ))}
+          {minimizedWindows.map((window) => {
+            const isHovered = hoveredApp === window.id
+
+            return (
+              <div key={window.id} className="relative group flex flex-col items-center">
+                {/* macOS Tooltip / 말풍선 */}
+                <div
+                  className={`pointer-events-none absolute -top-12 z-50 flex flex-col items-center transition-all duration-150 ease-out ${
+                    isHovered ? "opacity-100 -translate-y-1" : "opacity-0 translate-y-0"
+                  }`}
+                >
+                  <div className="whitespace-nowrap rounded-md bg-gray-900/85 px-3 py-1 text-xs font-medium text-white shadow-xl backdrop-blur-md border border-white/10">
+                    {window.title}
+                  </div>
+                  <div className="h-0 w-0 border-x-4 border-t-4 border-x-transparent border-t-gray-900/85" />
+                </div>
+
+                <button
+                  className="w-14 h-14 rounded-xl bg-white/50 flex items-center justify-center text-2xl shadow-lg transition-transform duration-200 ease-out"
+                  style={{
+                    transform: isHovered ? "scale(1.2) translateY(-8px)" : "scale(1)",
+                  }}
+                  onMouseEnter={() => setHoveredApp(window.id)}
+                  onMouseLeave={() => setHoveredApp(null)}
+                  onClick={() => onUnminimize(window.id)}
+                >
+                  📄
+                </button>
+              </div>
+            )
+          })}
         </div>
       </div>
 

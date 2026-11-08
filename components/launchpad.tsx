@@ -5,14 +5,10 @@ import {
   FinderIcon,
   SafariIcon,
   MessagesIcon,
-  CalendarIcon,
   PhotosIcon,
   MusicIcon,
   NotesIcon,
-  VSCodeIcon,
   TerminalIcon,
-  DockerIcon,
-  GitIcon,
   SettingsIcon,
 } from "./app-icons"
 
@@ -25,14 +21,10 @@ const apps = [
   { id: "finder" as AppType, icon: FinderIcon, label: "Finder" },
   { id: "safari" as AppType, icon: SafariIcon, label: "Safari" },
   { id: "messages" as AppType, icon: MessagesIcon, label: "Messages" },
-  { id: "calendar" as AppType, icon: CalendarIcon, label: "Calendar" },
   { id: "photos" as AppType, icon: PhotosIcon, label: "Photos" },
   { id: "music" as AppType, icon: MusicIcon, label: "Music" },
   { id: "notes" as AppType, icon: NotesIcon, label: "Notes" },
-  { id: "vscode" as AppType, icon: VSCodeIcon, label: "VS Code" },
   { id: "terminal" as AppType, icon: TerminalIcon, label: "Terminal" },
-  { id: "docker" as AppType, icon: DockerIcon, label: "Docker" },
-  { id: "git" as AppType, icon: GitIcon, label: "Git Bash" },
   { id: "settings" as AppType, icon: SettingsIcon, label: "Settings" },
 ]
 
