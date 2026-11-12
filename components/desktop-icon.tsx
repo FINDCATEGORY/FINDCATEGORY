@@ -8,14 +8,16 @@ interface DesktopIconProps {
   icon: string | React.ComponentType
   label: string
   onDoubleClick: () => void
+  onClick?: () => void
 }
 
-export function DesktopIcon({ icon, label, onDoubleClick }: DesktopIconProps) {
+export function DesktopIcon({ icon, label, onDoubleClick, onClick }: DesktopIconProps) {
   const [clicks, setClicks] = useState(0)
   const [isSelected, setIsSelected] = useState(false)
 
   const handleClick = useCallback(() => {
     setIsSelected(true)
+    onClick?.()
     const newClicks = clicks + 1
     setClicks(newClicks)
 
@@ -30,7 +32,7 @@ export function DesktopIcon({ icon, label, onDoubleClick }: DesktopIconProps) {
         setClicks(0)
       }, 300)
     }
-  }, [clicks, onDoubleClick])
+  }, [clicks, onDoubleClick, onClick])
 
   const IconComponent = typeof icon === "string" ? null : icon
 

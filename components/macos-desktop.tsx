@@ -190,11 +190,11 @@ export function MacOSDesktop({ onRestart }: MacOSDesktopProps = {}) {
           windows.map((w) =>
             w.id === existingWindow.id
               ? {
-                  ...w,
-                  settingsCategory: options.settingsCategory,
-                  settingsCategoryNonce: Date.now(),
-                  zIndex: highestZIndex + 1,
-                }
+                ...w,
+                settingsCategory: options.settingsCategory,
+                settingsCategoryNonce: Date.now(),
+                zIndex: highestZIndex + 1,
+              }
               : w
           )
         )
@@ -206,11 +206,11 @@ export function MacOSDesktop({ onRestart }: MacOSDesktopProps = {}) {
           windows.map((w) =>
             w.id === existingWindow.id
               ? {
-                  ...w,
-                  finderFolderId: options.finderFolderId,
-                  finderFolderNonce: Date.now(),
-                  zIndex: highestZIndex + 1,
-                }
+                ...w,
+                finderFolderId: options.finderFolderId,
+                finderFolderNonce: Date.now(),
+                zIndex: highestZIndex + 1,
+              }
               : w
           )
         )
@@ -233,12 +233,12 @@ export function MacOSDesktop({ onRestart }: MacOSDesktopProps = {}) {
           windows.map((w) =>
             w.id === minimizedWindow.id
               ? {
-                  ...w,
-                  isMinimized: false,
-                  settingsCategory: options.settingsCategory,
-                  settingsCategoryNonce: Date.now(),
-                  zIndex: highestZIndex + 1,
-                }
+                ...w,
+                isMinimized: false,
+                settingsCategory: options.settingsCategory,
+                settingsCategoryNonce: Date.now(),
+                zIndex: highestZIndex + 1,
+              }
               : w
           )
         )
@@ -250,12 +250,12 @@ export function MacOSDesktop({ onRestart }: MacOSDesktopProps = {}) {
           windows.map((w) =>
             w.id === minimizedWindow.id
               ? {
-                  ...w,
-                  isMinimized: false,
-                  finderFolderId: options.finderFolderId,
-                  finderFolderNonce: Date.now(),
-                  zIndex: highestZIndex + 1,
-                }
+                ...w,
+                isMinimized: false,
+                finderFolderId: options.finderFolderId,
+                finderFolderNonce: Date.now(),
+                zIndex: highestZIndex + 1,
+              }
               : w
           )
         )
@@ -342,11 +342,11 @@ export function MacOSDesktop({ onRestart }: MacOSDesktopProps = {}) {
       windows.map((w) =>
         w.id === id
           ? {
-              ...w,
-              isMaximized: !w.isMaximized,
-              position: w.isMaximized ? w.position : { x: 0, y: 28 },
-              size: w.isMaximized ? w.size : { width: window.innerWidth, height: window.innerHeight - 28 - 80 },
-            }
+            ...w,
+            isMaximized: !w.isMaximized,
+            position: w.isMaximized ? w.position : { x: 0, y: 28 },
+            size: w.isMaximized ? w.size : { width: window.innerWidth, height: window.innerHeight - 28 - 80 },
+          }
           : w,
       ),
     )
@@ -377,7 +377,7 @@ export function MacOSDesktop({ onRestart }: MacOSDesktopProps = {}) {
       y: e.clientY,
       items: [
         { label: "Launchpad", subLabel: "모아보기", action: () => setLaunchpadOpen(true) },
-        { divider: true, label: "", action: () => {} },
+        { divider: true, label: "", action: () => { } },
         { label: "Finder", subLabel: "브랜드영상보기", action: () => openApp("finder", "Finder") },
         { label: "Safari", subLabel: "게시판", action: () => openApp("safari", "Safari") },
         { label: "Messages", subLabel: "채팅", action: () => openApp("messages", "Messages") },
@@ -451,17 +451,15 @@ export function MacOSDesktop({ onRestart }: MacOSDesktopProps = {}) {
         </div>
 
         <div className="absolute bottom-20 md:bottom-32 left-4 md:left-8 flex flex-col gap-3 md:gap-4 items-start">
-          {/* 모바일 화면에서 하단 독 대신 시계 위로 이동 배치되는 노트(공지) 앱 */}
-          <button
-            type="button"
-            className="md:hidden flex flex-col items-center gap-1 group cursor-pointer focus:outline-none pl-2"
-            onClick={() => openApp("notes", "Notes")}
-          >
-            <div className="w-12 h-12 rounded-2xl shadow-lg overflow-hidden border border-white/20 active:scale-95 transition-transform">
-              <NotesIcon />
-            </div>
-            <span className="text-white text-xs font-medium drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">공지</span>
-          </button>
+          {/* 모바일 화면에서 하단 독 대신 시계 위로 이동 배치되는 노트(공지) 앱 (우측 아이콘과 동일한 DesktopIcon 컴포넌트 및 크기 적용) */}
+          <div className="md:hidden">
+            <DesktopIcon
+              icon={NotesIcon}
+              label="공지"
+              onDoubleClick={() => openApp("notes", "Notes")}
+              onClick={() => openApp("notes", "Notes")}
+            />
+          </div>
           <ClockWidget />
           <CalendarWidget />
         </div>
