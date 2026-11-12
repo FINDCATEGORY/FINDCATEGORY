@@ -26,25 +26,19 @@ export const MessagesIcon = () => (
   </div>
 )
 
-export const PhotosIcon = () => (
-  <div className="w-full h-full rounded-[22%] overflow-hidden">
-    <img
-      src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/493155-vxGeIhTw0EvXAZbKcAyW67QfvNVrfq.webp"
-      alt="Photos"
-      className="w-full h-full object-cover"
-    />
+export const SoundIcon = () => (
+  <div className="w-full h-full rounded-[22%] overflow-hidden bg-gradient-to-br from-indigo-600 via-purple-600 to-rose-500 flex items-center justify-center shadow-inner relative">
+    <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/30 to-transparent rounded-t-[22%]" />
+    <div className="relative flex items-center justify-center text-white drop-shadow-md">
+      <svg className="w-7 h-7 sm:w-8 sm:h-8" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M11 5L6 9H2v6h4l5 4V5zM15.54 8.46a5 5 0 0 1 0 7.07l-1.41-1.41a3 3 0 0 0 0-4.24l1.41-1.42zM19.07 4.93a10 10 0 0 1 0 14.14l-1.41-1.41a8 8 0 0 0 0-11.31l1.41-1.42z" />
+      </svg>
+    </div>
   </div>
 )
 
-export const MusicIcon = () => (
-  <div className="w-full h-full rounded-[22%] overflow-hidden">
-    <img
-      src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/images-vvoaxB7U9YJzKLYcq9aiQZVl3SnXd1.jpg"
-      alt="Music"
-      className="w-full h-full object-cover"
-    />
-  </div>
-)
+export const MusicIcon = SoundIcon
+
 
 export const NotesIcon = () => (
   <div className="w-full h-full rounded-[22%] overflow-hidden">

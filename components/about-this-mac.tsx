@@ -25,8 +25,11 @@ export function AboutThisMac({ onClose }: AboutThisMacProps) {
             </svg>
           </div>
 
-          <h1 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-1">MacBook Pro</h1>
-          <p className="text-xs sm:text-sm text-gray-500">16-inch, 2021</p>
+          <h1 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-1">FINDCATEGORY</h1>
+          <p className="text-xs sm:text-sm text-gray-500">Visual Brand Exploration Portal</p>
+          <div className="mt-3 px-3 py-1.5 bg-blue-50/80 dark:bg-blue-950/40 border border-blue-100 rounded-lg text-xs text-blue-800 text-center font-medium">
+            검색 없이 visual로 탐색하고, 브랜드 대표 상품의 솔직한 평가를 공유하는 공간
+          </div>
         </div>
 
         {/* System Info */}

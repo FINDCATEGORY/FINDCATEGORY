@@ -8,8 +8,6 @@ import {
   FinderIcon,
   SafariIcon,
   MessagesIcon,
-  PhotosIcon,
-  MusicIcon,
   NotesIcon,
   TerminalIcon,
   SettingsIcon,
@@ -18,36 +16,36 @@ import {
 
 interface DockProps {
   onAppClick: (app: AppType, title: string) => void
+  onQuitApp?: (app: AppType) => void
   minimizedWindows: WindowState[]
   onUnminimize: (id: string) => void
   onLaunchpadClick: () => void
   openApps: AppType[]
 }
 
-const dockApps = [
-  { id: "finder" as AppType, icon: FinderIcon, label: "Finder" },
-  { id: "safari" as AppType, icon: SafariIcon, label: "Safari" },
-  { id: "messages" as AppType, icon: MessagesIcon, label: "Messages" },
-  { id: "photos" as AppType, icon: PhotosIcon, label: "Photos" },
-  { id: "music" as AppType, icon: MusicIcon, label: "Music" },
-  { id: "notes" as AppType, icon: NotesIcon, label: "Notes" },
-  { id: "terminal" as AppType, icon: TerminalIcon, label: "Terminal" },
-  { id: "settings" as AppType, icon: SettingsIcon, label: "Settings" },
+export const dockApps = [
+  { id: "finder" as AppType, icon: FinderIcon, label: "Finder", subLabel: "브랜드영상보기" },
+  { id: "safari" as AppType, icon: SafariIcon, label: "Safari", subLabel: "게시판" },
+  { id: "messages" as AppType, icon: MessagesIcon, label: "Messages", subLabel: "채팅" },
+  { id: "notes" as AppType, icon: NotesIcon, label: "Notes", subLabel: "공지" },
+  { id: "terminal" as AppType, icon: TerminalIcon, label: "Terminal", subLabel: "터미널" },
+  { id: "settings" as AppType, icon: SettingsIcon, label: "Settings", subLabel: "설정" },
 ]
 
-export function Dock({ onAppClick, minimizedWindows, onUnminimize, onLaunchpadClick, openApps }: DockProps) {
+export function Dock({ onAppClick, onQuitApp, minimizedWindows, onUnminimize, onLaunchpadClick, openApps }: DockProps) {
   const [hoveredApp, setHoveredApp] = useState<string | null>(null)
   const [contextMenu, setContextMenu] = useState<{ app: AppType; x: number; y: number } | null>(null)
 
   const handleContextMenu = (e: React.MouseEvent, app: AppType) => {
     e.preventDefault()
+    e.stopPropagation()
     setContextMenu({ app, x: e.clientX, y: e.clientY })
   }
 
   return (
     <>
       <div className="fixed bottom-2 left-1/2 -translate-x-1/2 z-50">
-        <div className="bg-white/30 macos-blur macos-dock-shadow rounded-2xl px-2 py-2 flex items-end gap-1 border border-white/20">
+        <div className="bg-[var(--macos-dock-bg)] macos-blur macos-dock-shadow rounded-2xl px-2 py-2 flex items-end gap-1 border border-white/20 dark:border-white/15 transition-colors">
           {/* Launchpad icon */}
           <div className="relative group flex flex-col items-center">
             {/* macOS Tooltip / 말풍선 */}
@@ -58,8 +56,9 @@ export function Dock({ onAppClick, minimizedWindows, onUnminimize, onLaunchpadCl
                   : "opacity-0 translate-y-0"
               }`}
             >
-              <div className="whitespace-nowrap rounded-md bg-gray-900/85 px-3 py-1 text-xs font-medium text-white shadow-xl backdrop-blur-md border border-white/10">
-                Launchpad
+              <div className="whitespace-nowrap rounded-md bg-gray-900/85 px-3 py-1 text-xs font-medium text-white shadow-xl backdrop-blur-md border border-white/10 flex items-center gap-1.5">
+                <span>Launchpad</span>
+                <span className="text-[11px] font-normal text-white/70">모아보기</span>
               </div>
               <div className="h-0 w-0 border-x-4 border-t-4 border-x-transparent border-t-gray-900/85" />
             </div>
@@ -79,7 +78,7 @@ export function Dock({ onAppClick, minimizedWindows, onUnminimize, onLaunchpadCl
             </button>
           </div>
 
-          <div className="w-px h-12 bg-white/30 mx-1" />
+          <div className="w-px h-12 bg-white/30 dark:bg-white/15 mx-1" />
 
           {dockApps.map((app) => {
             const isHovered = hoveredApp === app.id
@@ -94,8 +93,9 @@ export function Dock({ onAppClick, minimizedWindows, onUnminimize, onLaunchpadCl
                     isHovered ? "opacity-100 -translate-y-1" : "opacity-0 translate-y-0"
                   }`}
                 >
-                  <div className="whitespace-nowrap rounded-md bg-gray-900/85 px-3 py-1 text-xs font-medium text-white shadow-xl backdrop-blur-md border border-white/10">
-                    {app.label}
+                  <div className="whitespace-nowrap rounded-md bg-gray-900/85 px-3 py-1 text-xs font-medium text-white shadow-xl backdrop-blur-md border border-white/10 flex items-center gap-1.5">
+                    <span>{app.label}</span>
+                    <span className="text-[11px] font-normal text-white/70">{app.subLabel}</span>
                   </div>
                   <div className="h-0 w-0 border-x-4 border-t-4 border-x-transparent border-t-gray-900/85" />
                 </div>
@@ -117,7 +117,7 @@ export function Dock({ onAppClick, minimizedWindows, onUnminimize, onLaunchpadCl
 
                   {/* Running indicator */}
                   {isOpen && (
-                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-gray-700 rounded-full" />
+                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-gray-700 dark:bg-white/80 rounded-full" />
                   )}
                 </button>
               </div>
@@ -125,7 +125,7 @@ export function Dock({ onAppClick, minimizedWindows, onUnminimize, onLaunchpadCl
           })}
 
           {/* Divider */}
-          {minimizedWindows.length > 0 && <div className="w-px h-12 bg-white/30 mx-1" />}
+          {minimizedWindows.length > 0 && <div className="w-px h-12 bg-white/30 dark:bg-white/15 mx-1" />}
 
           {/* Minimized windows */}
           {minimizedWindows.map((window) => {
@@ -146,7 +146,7 @@ export function Dock({ onAppClick, minimizedWindows, onUnminimize, onLaunchpadCl
                 </div>
 
                 <button
-                  className="w-14 h-14 rounded-xl bg-white/50 flex items-center justify-center text-2xl shadow-lg transition-transform duration-200 ease-out"
+                  className="w-14 h-14 rounded-xl bg-white/50 dark:bg-zinc-800/70 flex items-center justify-center text-2xl shadow-lg transition-transform duration-200 ease-out"
                   style={{
                     transform: isHovered ? "scale(1.2) translateY(-8px)" : "scale(1)",
                   }}
@@ -164,22 +164,25 @@ export function Dock({ onAppClick, minimizedWindows, onUnminimize, onLaunchpadCl
 
       {/* Context menu */}
       {contextMenu && (
-        <div
-          className="fixed bg-[var(--macos-menu-bg)] macos-blur border border-black/10 rounded-lg shadow-lg py-1 z-[60] min-w-[180px]"
-          style={{ left: contextMenu.x, top: contextMenu.y - 100 }}
-          onClick={() => setContextMenu(null)}
-        >
-          <button className="w-full px-4 py-1.5 text-left text-sm hover:bg-blue-500 hover:text-white transition-colors">
-            Options
-          </button>
-          <button className="w-full px-4 py-1.5 text-left text-sm hover:bg-blue-500 hover:text-white transition-colors">
-            Show in Finder
-          </button>
-          <div className="h-px bg-black/10 my-1" />
-          <button className="w-full px-4 py-1.5 text-left text-sm hover:bg-blue-500 hover:text-white transition-colors">
-            Quit
-          </button>
-        </div>
+        <>
+          <div className="fixed inset-0 z-[55]" onClick={() => setContextMenu(null)} />
+          <div
+            className="fixed bg-[var(--macos-menu-bg)] macos-blur border border-black/10 dark:border-white/10 rounded-lg shadow-lg py-1 z-[60] min-w-[140px] text-slate-900 dark:text-zinc-100"
+            style={{ left: contextMenu.x, top: Math.max(8, contextMenu.y - 48) }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => {
+                onQuitApp?.(contextMenu.app)
+                setContextMenu(null)
+              }}
+              className="w-full px-4 py-1.5 text-left text-sm hover:bg-blue-500 hover:text-white transition-colors cursor-pointer"
+            >
+              Quit
+            </button>
+          </div>
+        </>
       )}
     </>
   )

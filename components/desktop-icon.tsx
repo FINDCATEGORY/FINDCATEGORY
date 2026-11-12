@@ -46,7 +46,7 @@ export function DesktopIcon({ icon, label, onDoubleClick }: DesktopIconProps) {
           <IconComponent />
         </div>
       ) : (
-        <div className="text-5xl">{icon}</div>
+        <div className="text-5xl">{typeof icon === "string" ? icon : null}</div>
       )}
       <span className="text-xs font-medium text-white drop-shadow-lg text-center">{label}</span>
     </button>

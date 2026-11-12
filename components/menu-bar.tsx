@@ -1,8 +1,14 @@
 "use client"
 
-import { useState } from "react"
-import { Search, BellIcon, LayoutGrid } from "lucide-react"
+import { useState, useEffect } from "react"
+import { Search, BellIcon, LayoutGrid, Volume2, Volume1, VolumeX } from "lucide-react"
 import { CustomLogoIcon } from "./custom-logo"
+import type { AppType } from "./macos-desktop"
+import { useSystemControls } from "@/lib/system-controls"
+import {
+  NOTIFICATION_CENTER_UPDATED_EVENT,
+  getStoredNotificationCenterItems,
+} from "./NotificationBanner"
 
 interface MenuBarProps {
   currentTime: Date
@@ -10,11 +16,14 @@ interface MenuBarProps {
   onSpotlightClick: () => void
   onNotificationClick: () => void
   onAboutThisMac?: () => void
+  onRestart?: () => void
   onControlCenterClick?: () => void
+  onOpenApp?: (app: AppType, title: string, options?: { settingsCategory?: string }) => void
+  onLaunchpadClick?: () => void
 }
 
 interface MenuDropdownProps {
-  items: Array<{ label: string; shortcut?: string; divider?: boolean; action?: () => void }>
+  items: Array<{ label?: string; shortcut?: string; divider?: boolean; action?: () => void }>
   onClose: () => void
 }
 
@@ -27,7 +36,7 @@ function MenuDropdown({ items, onClose }: MenuDropdownProps) {
         ) : (
           <button
             key={index}
-            className="w-full px-4 py-1.5 text-left text-sm hover:bg-blue-500 hover:text-white transition-colors flex items-center justify-between"
+            className="w-full px-4 py-1.5 text-left text-sm whitespace-nowrap hover:bg-blue-500 hover:text-white transition-colors flex items-center justify-between gap-4"
             onClick={() => {
               item.action?.()
               onClose()
@@ -48,9 +57,36 @@ export function MenuBar({
   onSpotlightClick,
   onNotificationClick,
   onAboutThisMac,
+  onRestart,
   onControlCenterClick,
+  onOpenApp,
+  onLaunchpadClick,
 }: MenuBarProps) {
   const [activeMenu, setActiveMenu] = useState<string | null>(null)
+  const [hasNotifications, setHasNotifications] = useState(false)
+  const { controls } = useSystemControls()
+
+  const StatusVolumeIcon =
+    controls.isMuted || controls.volume === 0
+      ? VolumeX
+      : controls.volume < 50
+      ? Volume1
+      : Volume2
+
+  useEffect(() => {
+    const checkCount = () => {
+      const items = getStoredNotificationCenterItems()
+      setHasNotifications(items.length > 0)
+    }
+
+    checkCount()
+    window.addEventListener(NOTIFICATION_CENTER_UPDATED_EVENT, checkCount)
+    window.addEventListener("storage", checkCount)
+    return () => {
+      window.removeEventListener(NOTIFICATION_CENTER_UPDATED_EVENT, checkCount)
+      window.removeEventListener("storage", checkCount)
+    }
+  }, [])
 
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString("en-US", {
@@ -63,66 +99,16 @@ export function MenuBar({
   }
 
   const appleMenuItems = [
-    { label: "About This Mac", action: onAboutThisMac },
+    { label: "About FINDCATEGORY", action: onAboutThisMac },
     { divider: true },
-    { label: "System Settings...", shortcut: "⌘,", action: () => console.log("Opening System Settings") },
-    { label: "App Store...", action: () => console.log("Opening App Store") },
-    { divider: true },
-    { label: "Recent Items", action: () => console.log("Recent Items") },
-    { divider: true },
-    { label: "Sleep", action: () => console.log("Sleep") },
-    { label: "Restart...", action: () => console.log("Restart") },
-    { label: "Shut Down...", action: () => console.log("Shut Down") },
+    { label: "Restart", action: onRestart },
   ]
 
-  const fileMenuItems = [
-    { label: "New Finder Window", shortcut: "⌘N", action: () => console.log("New Finder Window") },
-    { label: "New Folder", shortcut: "⇧⌘N", action: () => console.log("New Folder") },
-    { label: "New Smart Folder", shortcut: "⌥⌘N", action: () => console.log("New Smart Folder") },
-    { divider: true },
-    { label: "Open", shortcut: "⌘O", action: () => console.log("Open") },
-    { label: "Close Window", shortcut: "⌘W", action: () => console.log("Close Window") },
-  ]
-
-  const editMenuItems = [
-    { label: "Undo", shortcut: "⌘Z", action: () => console.log("Undo") },
-    { label: "Redo", shortcut: "⇧⌘Z", action: () => console.log("Redo") },
-    { divider: true },
-    { label: "Cut", shortcut: "⌘X", action: () => console.log("Cut") },
-    { label: "Copy", shortcut: "⌘C", action: () => console.log("Copy") },
-    { label: "Paste", shortcut: "⌘V", action: () => console.log("Paste") },
-    { label: "Select All", shortcut: "⌘A", action: () => console.log("Select All") },
-  ]
-
-  const viewMenuItems = [
-    { label: "as Icons", shortcut: "⌘1", action: () => console.log("View as Icons") },
-    { label: "as List", shortcut: "⌘2", action: () => console.log("View as List") },
-    { label: "as Columns", shortcut: "⌘3", action: () => console.log("View as Columns") },
-    { label: "as Gallery", shortcut: "⌘4", action: () => console.log("View as Gallery") },
-    { divider: true },
-    { label: "Show Toolbar", action: () => console.log("Show Toolbar") },
-    { label: "Show Sidebar", shortcut: "⌥⌘S", action: () => console.log("Show Sidebar") },
-    { label: "Show Status Bar", action: () => console.log("Show Status Bar") },
-  ]
-
-  const goMenuItems = [
-    { label: "Back", shortcut: "⌘[", action: () => console.log("Go Back") },
-    { label: "Forward", shortcut: "⌘]", action: () => console.log("Go Forward") },
-    { label: "Enclosing Folder", shortcut: "⌘↑", action: () => console.log("Enclosing Folder") },
-    { divider: true },
-    { label: "Documents", shortcut: "⇧⌘O", action: () => console.log("Go to Documents") },
-    { label: "Desktop", shortcut: "⇧⌘D", action: () => console.log("Go to Desktop") },
-    { label: "Downloads", shortcut: "⌥⌘L", action: () => console.log("Go to Downloads") },
-    { label: "Home", shortcut: "⇧⌘H", action: () => console.log("Go to Home") },
-    { label: "Applications", shortcut: "⇧⌘A", action: () => console.log("Go to Applications") },
-  ]
-
-  const helpMenuItems = [
-    { label: "Search", action: () => console.log("Help Search") },
-    { divider: true },
-    { label: `${activeApp} Help`, action: () => console.log(`${activeApp} Help`) },
-    { label: "Tips for Mac", action: () => console.log("Tips for Mac") },
-    { label: "macOS Support", action: () => console.log("macOS Support") },
+  const appMenuItems = [
+    { label: "로그인", action: () => onOpenApp?.("settings", "Settings", { settingsCategory: "로그인" }) },
+    { label: "회원가입", action: () => onOpenApp?.("settings", "Settings", { settingsCategory: "회원가입" }) },
+    { label: "공지", action: () => onOpenApp?.("notes", "Notes") },
+    { label: "설정", action: () => onOpenApp?.("settings", "Settings") },
   ]
 
   const menus = [
@@ -131,17 +117,20 @@ export function MenuBar({
       label: <CustomLogoIcon />,
       items: appleMenuItems,
     },
-    { id: "app", label: <span className="font-bold tracking-tight">FINDCATEGORY</span>, items: fileMenuItems },
-    { id: "file", label: "File", items: fileMenuItems },
-    { id: "edit", label: "Edit", items: editMenuItems },
-    { id: "view", label: "View", items: viewMenuItems },
-    { id: "go", label: "Go", items: goMenuItems },
-    { id: "window", label: "Window", items: [] },
-    { id: "help", label: "Help", items: helpMenuItems },
+    { id: "app", label: <span className="font-bold tracking-tight">FINDCATEGORY</span>, items: appMenuItems },
+  ]
+
+  const quickAppMenus = [
+    { id: "launchpad", label: "Launchpad", tooltip: "모아보기", action: () => onLaunchpadClick?.() },
+    { id: "finder", label: "Finder", tooltip: "브랜드영상보기", action: () => onOpenApp?.("finder", "Finder") },
+    { id: "safari", label: "Safari", tooltip: "게시판", action: () => onOpenApp?.("safari", "Safari") },
+    { id: "messages", label: "Messages", tooltip: "채팅", action: () => onOpenApp?.("messages", "Messages") },
+    { id: "notes", label: "Notes", tooltip: "공지", action: () => onOpenApp?.("notes", "Notes") },
+    { id: "terminal", label: "Terminal", tooltip: "터미널", action: () => onOpenApp?.("terminal", "Terminal") },
   ]
 
   return (
-    <div className="h-7 bg-[var(--macos-menu-bg)] macos-blur border-b border-black/10 flex items-center justify-between px-4 relative z-50 text-sm select-none">
+    <div className="h-7 bg-[var(--macos-menu-bg)] macos-blur border-b border-black/10 dark:border-white/10 flex items-center justify-between px-4 relative z-50 text-sm text-slate-900 dark:text-zinc-100 select-none">
       <div className="flex items-center gap-1">
         {menus.map((menu) => (
           <div key={menu.id} className="relative">
@@ -158,17 +147,53 @@ export function MenuBar({
             )}
           </div>
         ))}
+
+        {quickAppMenus.map((item) => (
+          <div key={item.id} className="relative group flex items-center">
+            <button
+              type="button"
+              className="px-2 py-0.5 rounded transition-colors font-medium hover:bg-white/30 cursor-pointer"
+              onClick={() => {
+                setActiveMenu(null)
+                item.action()
+              }}
+            >
+              {item.label}
+            </button>
+            {/* 한글 말풍선 (상단바 아래로 표시) */}
+            <div className="pointer-events-none absolute top-full left-1/2 -translate-x-1/2 mt-1 z-50 flex flex-col items-center opacity-0 translate-y-0 group-hover:opacity-100 group-hover:translate-y-0.5 transition-all duration-150 ease-out">
+              <div className="h-0 w-0 border-x-4 border-b-4 border-x-transparent border-b-gray-900/85" />
+              <div className="whitespace-nowrap rounded-md bg-gray-900/85 px-2.5 py-1 text-xs font-medium text-white shadow-xl backdrop-blur-md border border-white/10">
+                {item.tooltip}
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
 
       <div className="flex items-center gap-3">
-        <button className="hover:bg-white/30 p-1 rounded transition-colors" onClick={onSpotlightClick}>
+        <button
+          className="hover:bg-white/30 dark:hover:bg-white/10 p-1 rounded transition-colors"
+          onClick={onControlCenterClick}
+          title={controls.isMuted || controls.volume === 0 ? "Volume: Muted" : `Volume: ${controls.volume}%`}
+        >
+          <StatusVolumeIcon className={`w-4 h-4 ${controls.isMuted || controls.volume === 0 ? "opacity-50" : ""}`} />
+        </button>
+        <button className="hover:bg-white/30 dark:hover:bg-white/10 p-1 rounded transition-colors" onClick={onSpotlightClick} title="Spotlight">
           <Search className="w-4 h-4" />
         </button>
-        <button className="hover:bg-white/30 p-1 rounded transition-colors" onClick={onControlCenterClick}>
+        <button className="hover:bg-white/30 dark:hover:bg-white/10 p-1 rounded transition-colors" onClick={onControlCenterClick} title="Control Center">
           <LayoutGrid className="w-4 h-4" />
         </button>
-        <button className="hover:bg-white/30 p-1 rounded transition-colors" onClick={onNotificationClick}>
+        <button
+          className="hover:bg-white/30 dark:hover:bg-white/10 p-1 rounded transition-colors relative"
+          onClick={onNotificationClick}
+          title="알림"
+        >
           <BellIcon className="w-4 h-4" />
+          {hasNotifications && (
+            <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-blue-500 rounded-full ring-1 ring-white" />
+          )}
         </button>
         <span className="font-medium">{formatTime(currentTime)}</span>
       </div>

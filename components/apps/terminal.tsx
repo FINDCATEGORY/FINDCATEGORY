@@ -3,208 +3,202 @@
 import type React from "react"
 
 import { useState, useRef, useEffect } from "react"
+import { useAuth } from "@/lib/auth"
+
+interface TerminalBoardEntry {
+  id: string
+  author: string
+  authorEmail?: string
+  text: string
+  createdAt: string
+}
+
+const TERMINAL_BOARD_STORAGE_KEY = "findcategory_terminal_board"
+const TERMINAL_BOARD_UPDATED_EVENT = "findcategory_terminal_board_updated"
+
+function loadTerminalEntries(): TerminalBoardEntry[] {
+  if (typeof window === "undefined") return []
+  try {
+    const saved = localStorage.getItem(TERMINAL_BOARD_STORAGE_KEY)
+    if (saved) {
+      const parsed = JSON.parse(saved) as TerminalBoardEntry[]
+      if (Array.isArray(parsed)) return parsed
+    }
+    localStorage.setItem(TERMINAL_BOARD_STORAGE_KEY, JSON.stringify([]))
+  } catch {}
+  return []
+}
+
+function saveTerminalEntries(entries: TerminalBoardEntry[]): void {
+  if (typeof window === "undefined") return
+  try {
+    localStorage.setItem(TERMINAL_BOARD_STORAGE_KEY, JSON.stringify(entries))
+    queueMicrotask(() => {
+      window.dispatchEvent(new CustomEvent(TERMINAL_BOARD_UPDATED_EVENT, { detail: entries }))
+    })
+  } catch (err) {
+    console.error("Failed to save terminal board entries:", err)
+  }
+}
 
 export function Terminal() {
-  const [history, setHistory] = useState<string[]>([
-    "Last login: " + new Date().toLocaleString(),
-    "Welcome to macOS Terminal",
-    "",
-  ])
+  const { user, isLoggedIn, isAdmin } = useAuth()
+  const [entries, setEntries] = useState<TerminalBoardEntry[]>([])
+  const [loginTime, setLoginTime] = useState<string>("")
   const [currentCommand, setCurrentCommand] = useState("")
+  const [isDeleteMode, setIsDeleteMode] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const terminalRef = useRef<HTMLDivElement>(null)
+
+  const promptUser = isLoggedIn && user?.nickname ? user.nickname : "guest"
+
+  useEffect(() => {
+    setLoginTime(new Date().toLocaleString())
+    setEntries(loadTerminalEntries())
+
+    const handleSync = (event: Event) => {
+      const next = (event as CustomEvent<TerminalBoardEntry[]>).detail
+      if (Array.isArray(next)) {
+        setEntries(next)
+      }
+    }
+
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key === TERMINAL_BOARD_STORAGE_KEY) {
+        setEntries(loadTerminalEntries())
+      }
+    }
+
+    window.addEventListener(TERMINAL_BOARD_UPDATED_EVENT, handleSync)
+    window.addEventListener("storage", handleStorage)
+    return () => {
+      window.removeEventListener(TERMINAL_BOARD_UPDATED_EVENT, handleSync)
+      window.removeEventListener("storage", handleStorage)
+    }
+  }, [])
 
   useEffect(() => {
     inputRef.current?.focus()
     if (terminalRef.current) {
       terminalRef.current.scrollTop = terminalRef.current.scrollHeight
     }
-  }, [history])
-
-  const executeCommand = (cmd: string) => {
-    const trimmedCmd = cmd.trim()
-    const args = trimmedCmd.split(" ")
-    const command = args[0]
-    let output = ""
-
-    switch (command) {
-      case "ls":
-        if (args.includes("-la") || args.includes("-l")) {
-          output = `total 32
-drwxr-xr-x  8 developer  staff   256 Dec 15 10:30 .
-drwxr-xr-x  5 root       admin   160 Dec 10 09:00 ..
-drwx------  3 developer  staff    96 Dec 15 10:30 Desktop
-drwx------  4 developer  staff   128 Dec 14 15:20 Documents
-drwx------  5 developer  staff   160 Dec 15 09:45 Downloads
-drwx------  3 developer  staff    96 Dec 12 14:00 Music
-drwx------  4 developer  staff   128 Dec 13 11:30 Pictures
-drwx------  2 developer  staff    64 Dec 11 16:00 Videos`
-        } else {
-          output = "Desktop  Documents  Downloads  Music  Pictures  Videos"
-        }
-        break
-      case "pwd":
-        output = "/Users/developer"
-        break
-      case "whoami":
-        output = "developer"
-        break
-      case "date":
-        output = new Date().toString()
-        break
-      case "clear":
-        setHistory([])
-        return
-      case "help":
-        output =
-          "Available commands:\n  ls [-la]     - list directory contents\n  pwd          - print working directory\n  whoami       - print current user\n  date         - display current date and time\n  clear        - clear terminal screen\n  cat <file>   - display file contents\n  echo <text>  - print text to terminal\n  mkdir <dir>  - create directory\n  touch <file> - create file\n  rm <file>    - remove file\n  cd <dir>     - change directory\n  git          - git commands\n  npm          - npm commands\n  node         - node.js\n  python       - python interpreter\n  neofetch     - system information\n  help         - show this help message"
-        break
-      case "cat":
-        if (args[1]) {
-          output = `Contents of ${args[1]}:\nThis is a sample file content.`
-        } else {
-          output = "cat: missing file operand"
-        }
-        break
-      case "echo":
-        output = args.slice(1).join(" ")
-        break
-      case "mkdir":
-        if (args[1]) {
-          output = `Directory '${args[1]}' created`
-        } else {
-          output = "mkdir: missing operand"
-        }
-        break
-      case "touch":
-        if (args[1]) {
-          output = `File '${args[1]}' created`
-        } else {
-          output = "touch: missing file operand"
-        }
-        break
-      case "rm":
-        if (args[1]) {
-          output = `File '${args[1]}' removed`
-        } else {
-          output = "rm: missing operand"
-        }
-        break
-      case "cd":
-        if (args[1]) {
-          output = `Changed directory to ${args[1]}`
-        } else {
-          output = "cd: missing directory operand"
-        }
-        break
-      case "python":
-      case "python3":
-        if (args.includes("--version") || args.includes("-V")) {
-          output = "Python 3.11.5"
-        } else {
-          output = "Python 3.11.5\nType 'help' for more information."
-        }
-        break
-      case "neofetch":
-        output = `
-                    ###                  developer@macOS
-                  ####                   ----------------
-                 ###                     OS: macOS Sonoma 14.0
-         #######    #######              Host: MacBook Pro (16-inch, 2023)
-       ######################            Kernel: Darwin 23.0.0
-      #####################              Uptime: 2 days, 5 hours
-      ####################               Shell: zsh 5.9
-      ####################               Resolution: 3456x2234
-      #####################              DE: Aqua
-       ######################            WM: Quartz Compositor
-        ####################             Terminal: Terminal.app
-          ################               CPU: Apple M3 Max
-             ####     ####                GPU: Apple M3 Max
-                                          Memory: 8192MB / 36864MB
-        `
-        break
-      case "git":
-        if (args.includes("status")) {
-          output =
-            "On branch main\nYour branch is up to date with 'origin/main'.\n\nnothing to commit, working tree clean"
-        } else if (args.includes("branch")) {
-          output = "* main\n  develop\n  feature/new-ui"
-        } else if (args.includes("log")) {
-          output =
-            "commit a1b2c3d (HEAD -> main)\nAuthor: Developer <dev@example.com>\nDate:   " +
-            new Date().toDateString() +
-            "\n\n    Initial commit"
-        } else if (args.includes("clone")) {
-          output =
-            "Cloning into 'repository'...\nremote: Counting objects: 100, done.\nReceiving objects: 100% (100/100), done."
-        } else if (args.includes("pull")) {
-          output = "Already up to date."
-        } else if (args.includes("push")) {
-          output = "Everything up-to-date"
-        } else {
-          output =
-            "usage: git [--version] [--help] [-C <path>] [-c <name>=<value>]\n           [--exec-path[=<path>]] [--html-path] [--man-path] [--info-path]\n           [-p | --paginate | -P | --no-pager] [--no-replace-objects] [--bare]\n           [--git-dir=<path>] [--work-tree=<path>] [--namespace=<name>]\n           <command> [<args>]"
-        }
-        break
-      case "npm":
-        if (args.includes("--version") || args.includes("-v")) {
-          output = "10.2.4"
-        } else if (args.includes("install") || args.includes("i")) {
-          output = "added 245 packages in 3s"
-        } else if (args.includes("start")) {
-          output = "> dev\n> next dev\n\n   ▲ Next.js 14.0.0\n   - Local:        http://localhost:3000"
-        } else {
-          output = "npm v10.2.4\n\nUsage: npm <command>"
-        }
-        break
-      case "node":
-        if (args.includes("--version") || args.includes("-v")) {
-          output = "v20.10.0"
-        } else {
-          output = "Welcome to Node.js v20.10.0\nType '.help' for more information."
-        }
-        break
-      case "":
-        break
-      default:
-        output = `zsh: command not found: ${command}`
-    }
-
-    setHistory([...history, `developer@macOS ~ % ${cmd}`, output])
-  }
+  }, [entries])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (currentCommand.trim()) {
-      executeCommand(currentCommand)
-      setCurrentCommand("")
+    const trimmed = currentCommand.trim()
+    if (!trimmed) return
+
+    const newEntry: TerminalBoardEntry = {
+      id: `term-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      author: promptUser,
+      authorEmail: isLoggedIn ? user?.email : undefined,
+      text: trimmed,
+      createdAt: new Date().toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" }),
+    }
+
+    const updated = [...entries, newEntry]
+    setEntries(updated)
+    saveTerminalEntries(updated)
+    setCurrentCommand("")
+  }
+
+  const handleDeleteEntry = (entry: TerminalBoardEntry) => {
+    const isOwner = Boolean(isLoggedIn && user?.email && entry.authorEmail === user.email)
+    if (!isAdmin && !isOwner) return
+    const updated = entries.filter((item) => item.id !== entry.id)
+    setEntries(updated)
+    saveTerminalEntries(updated)
+    if (updated.length === 0) {
+      setIsDeleteMode(false)
     }
   }
 
   return (
-    <div
-      ref={terminalRef}
-      className="h-full bg-black text-green-400 font-mono text-xs md:text-sm p-4 overflow-auto cursor-text"
-      onClick={() => inputRef.current?.focus()}
-    >
-      {history.map((line, i) => (
-        <div key={i} className="leading-relaxed whitespace-pre-wrap break-all">
-          {line}
+    <div className="h-full bg-black text-green-400 font-mono text-xs md:text-sm flex flex-col">
+      <div
+        ref={terminalRef}
+        className="flex-1 p-4 overflow-auto cursor-text"
+        onClick={() => inputRef.current?.focus()}
+      >
+        <div className="leading-relaxed">Last login: {loginTime}</div>
+        <div className="leading-relaxed">Welcome to macOS Terminal</div>
+        <div className="leading-relaxed mb-2">한줄게시판입니다. 자유롭게 어떤 글이든 남겨보세요.</div>
+
+        {entries.map((entry) => {
+          const canDelete = isAdmin || Boolean(isLoggedIn && user?.email && entry.authorEmail === user.email)
+          return (
+            <div
+              key={entry.id}
+              className="group leading-relaxed whitespace-pre-wrap break-all flex items-start justify-between gap-2"
+            >
+              <div className="min-w-0 flex-1">
+                <span className="text-blue-400">{entry.author}@macOS</span>{" "}
+                <span className="text-white">~</span>{" "}
+                <span className="text-purple-400">%</span>{" "}
+                <span className="text-green-400">{entry.text}</span>
+              </div>
+              {canDelete && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleDeleteEntry(entry)
+                  }}
+                  className={`${
+                    isDeleteMode
+                      ? "opacity-100 text-rose-400 hover:text-rose-300"
+                      : "opacity-0 group-hover:opacity-100 text-zinc-500 hover:text-rose-400"
+                  } text-[11px] transition-opacity shrink-0 cursor-pointer`}
+                  title="댓글 삭제"
+                >
+                  [삭제]
+                </button>
+              )}
+            </div>
+          )
+        })}
+
+        <form onSubmit={handleSubmit} className="flex items-center gap-2 flex-wrap mt-0.5">
+          <span className="text-blue-400">{promptUser}@macOS</span>
+          <span className="text-white">~</span>
+          <span className="text-purple-400">%</span>
+          <input
+            ref={inputRef}
+            type="text"
+            value={currentCommand}
+            onChange={(e) => setCurrentCommand(e.target.value)}
+            className="flex-1 min-w-[200px] bg-transparent outline-none text-green-400"
+            autoFocus
+          />
+        </form>
+      </div>
+
+      {isAdmin && (
+        <div
+          className="border-t border-zinc-800 bg-zinc-950 px-4 py-2 flex items-center justify-between gap-2 text-xs select-none"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <span className="text-zinc-400">
+            관리자 · 댓글 {entries.length}개
+            {isDeleteMode && entries.length > 0 ? " (삭제할 댓글의 [삭제]를 누르세요)" : ""}
+          </span>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              disabled={entries.length === 0}
+              onClick={() => setIsDeleteMode((prev) => !prev)}
+              className={`px-2.5 py-1 rounded border text-xs transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
+                isDeleteMode
+                  ? "bg-rose-600/20 border-rose-500/50 text-rose-300 hover:bg-rose-600/30"
+                  : "bg-zinc-900 border-zinc-700 text-zinc-200 hover:bg-zinc-800"
+              }`}
+            >
+              {isDeleteMode ? "삭제 완료" : "댓글 삭제"}
+            </button>
+          </div>
         </div>
-      ))}
-      <form onSubmit={handleSubmit} className="flex items-center gap-2 flex-wrap">
-        <span className="text-blue-400">developer@macOS</span>
-        <span className="text-white">~</span>
-        <span className="text-purple-400">%</span>
-        <input
-          ref={inputRef}
-          type="text"
-          value={currentCommand}
-          onChange={(e) => setCurrentCommand(e.target.value)}
-          className="flex-1 min-w-[200px] bg-transparent outline-none text-green-400"
-          autoFocus
-        />
-      </form>
+      )}
     </div>
   )
 }

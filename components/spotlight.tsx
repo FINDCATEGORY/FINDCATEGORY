@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
-import { Search, Calculator, Calendar, Folder, Music, ImageIcon, FileText } from "lucide-react"
+import { Search, Calculator, Calendar, Folder, Volume2, ImageIcon, FileText } from "lucide-react"
 import type { AppType } from "./macos-desktop"
 
 interface SpotlightProps {
@@ -15,7 +15,7 @@ const searchResults = [
   { icon: Folder, label: "Documents", type: "Folder", action: () => {} },
   { icon: FileText, label: "Project Proposal.pdf", type: "PDF Document", action: () => {} },
   { icon: ImageIcon, label: "Vacation Photos", type: "Folder", action: () => {} },
-  { icon: Music, label: "Favorite Playlist", type: "Music", action: () => {} },
+  { icon: Volume2, label: "Sound System Control", type: "Application", action: () => {} },
   { icon: Calculator, label: "Calculator", type: "Application", action: () => {} },
   { icon: Calendar, label: "Calendar", type: "Application", action: () => {} },
 ]
