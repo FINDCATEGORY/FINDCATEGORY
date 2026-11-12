@@ -30,7 +30,7 @@ import { Terminal } from "./apps/terminal"
 import { Docker } from "./apps/docker"
 import { GitBash } from "./apps/git-bash"
 import { QuickTimePlayer } from "./apps/quicktime-player"
-import { DownloadsIcon } from "./app-icons"
+import { DownloadsIcon, NotesIcon } from "./app-icons"
 import { ClockWidget } from "./widgets/clock-widget"
 import { CalendarWidget } from "./widgets/calendar-widget"
 import { AnimatedWallpaper } from "./animated-wallpaper"
@@ -450,7 +450,18 @@ export function MacOSDesktop({ onRestart }: MacOSDesktopProps = {}) {
           <DesktopIcon icon={DownloadsIcon} label="브랜드 조사 신청" onDoubleClick={() => openApp("finder", "브랜드 조사 신청")} />
         </div>
 
-        <div className="absolute bottom-24 md:bottom-32 left-4 md:left-8 flex flex-col gap-4">
+        <div className="absolute bottom-20 md:bottom-32 left-4 md:left-8 flex flex-col gap-3 md:gap-4 items-start">
+          {/* 모바일 화면에서 하단 독 대신 시계 위로 이동 배치되는 노트(공지) 앱 */}
+          <button
+            type="button"
+            className="md:hidden flex flex-col items-center gap-1 group cursor-pointer focus:outline-none pl-2"
+            onClick={() => openApp("notes", "Notes")}
+          >
+            <div className="w-12 h-12 rounded-2xl shadow-lg overflow-hidden border border-white/20 active:scale-95 transition-transform">
+              <NotesIcon />
+            </div>
+            <span className="text-white text-xs font-medium drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">공지</span>
+          </button>
           <ClockWidget />
           <CalendarWidget />
         </div>

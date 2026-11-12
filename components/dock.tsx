@@ -45,7 +45,7 @@ export function Dock({ onAppClick, onQuitApp, minimizedWindows, onUnminimize, on
   return (
     <>
       <div className="fixed bottom-2 left-1/2 -translate-x-1/2 z-50">
-        <div className="bg-[var(--macos-dock-bg)] macos-blur macos-dock-shadow rounded-2xl px-2 py-2 flex items-end gap-1 border border-white/20 dark:border-white/15 transition-colors">
+        <div className="bg-[var(--macos-dock-bg)] macos-blur macos-dock-shadow rounded-2xl p-1.5 md:p-2 flex items-end gap-1 md:gap-1.5 border border-white/20 dark:border-white/15 transition-colors max-w-[calc(100vw-1rem)]">
           {/* Launchpad icon */}
           <div className="relative group flex flex-col items-center">
             {/* macOS Tooltip / 말풍선 */}
@@ -72,13 +72,13 @@ export function Dock({ onAppClick, onQuitApp, minimizedWindows, onUnminimize, on
               onMouseEnter={() => setHoveredApp("launchpad")}
               onMouseLeave={() => setHoveredApp(null)}
             >
-              <div className="w-14 h-14 rounded-xl shadow-lg overflow-hidden">
+              <div className="w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl shadow-lg overflow-hidden">
                 <LaunchpadIcon />
               </div>
             </button>
           </div>
 
-          <div className="w-px h-12 bg-white/30 dark:bg-white/15 mx-1" />
+          <div className="w-px h-9 md:h-12 bg-white/30 dark:bg-white/15 mx-0.5 md:mx-1 shrink-0" />
 
           {dockApps.map((app) => {
             const isHovered = hoveredApp === app.id
@@ -86,7 +86,12 @@ export function Dock({ onAppClick, onQuitApp, minimizedWindows, onUnminimize, on
             const IconComponent = app.icon
 
             return (
-              <div key={app.id} className="relative group flex flex-col items-center">
+              <div
+                key={app.id}
+                className={`relative group flex-col items-center ${
+                  app.id === "notes" ? "hidden md:flex" : "flex"
+                }`}
+              >
                 {/* macOS Tooltip / 말풍선 */}
                 <div
                   className={`pointer-events-none absolute -top-12 z-50 flex flex-col items-center transition-all duration-150 ease-out ${
@@ -111,7 +116,7 @@ export function Dock({ onAppClick, onQuitApp, minimizedWindows, onUnminimize, on
                   onClick={() => onAppClick(app.id, app.label)}
                   onContextMenu={(e) => handleContextMenu(e, app.id)}
                 >
-                  <div className="w-14 h-14 rounded-xl shadow-lg overflow-hidden">
+                  <div className="w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl shadow-lg overflow-hidden">
                     <IconComponent />
                   </div>
 
@@ -146,7 +151,7 @@ export function Dock({ onAppClick, onQuitApp, minimizedWindows, onUnminimize, on
                 </div>
 
                 <button
-                  className="w-14 h-14 rounded-xl bg-white/50 dark:bg-zinc-800/70 flex items-center justify-center text-2xl shadow-lg transition-transform duration-200 ease-out"
+                  className="w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl bg-white/50 dark:bg-zinc-800/70 flex items-center justify-center text-xl md:text-2xl shadow-lg transition-transform duration-200 ease-out"
                   style={{
                     transform: isHovered ? "scale(1.2) translateY(-8px)" : "scale(1)",
                   }}

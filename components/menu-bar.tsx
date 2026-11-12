@@ -130,12 +130,12 @@ export function MenuBar({
   ]
 
   return (
-    <div className="h-7 bg-[var(--macos-menu-bg)] macos-blur border-b border-black/10 dark:border-white/10 flex items-center justify-between px-4 relative z-50 text-sm text-slate-900 dark:text-zinc-100 select-none">
-      <div className="flex items-center gap-1">
+    <div className="h-7 bg-[var(--macos-menu-bg)] macos-blur border-b border-black/10 dark:border-white/10 flex items-center justify-between px-2 md:px-4 relative z-50 text-xs md:text-sm text-slate-900 dark:text-zinc-100 select-none">
+      <div className="flex items-center gap-1 shrink-0">
         {menus.map((menu) => (
-          <div key={menu.id} className="relative">
+          <div key={menu.id} className="relative shrink-0">
             <button
-              className={`px-2 py-0.5 rounded transition-colors font-medium ${
+              className={`px-1.5 md:px-2 py-0.5 rounded transition-colors font-medium flex items-center shrink-0 ${
                 activeMenu === menu.id ? "bg-blue-500 text-white" : "hover:bg-white/30"
               }`}
               onClick={() => setActiveMenu(activeMenu === menu.id ? null : menu.id)}
@@ -148,54 +148,57 @@ export function MenuBar({
           </div>
         ))}
 
-        {quickAppMenus.map((item) => (
-          <div key={item.id} className="relative group flex items-center">
-            <button
-              type="button"
-              className="px-2 py-0.5 rounded transition-colors font-medium hover:bg-white/30 cursor-pointer"
-              onClick={() => {
-                setActiveMenu(null)
-                item.action()
-              }}
-            >
-              {item.label}
-            </button>
-            {/* 한글 말풍선 (상단바 아래로 표시) */}
-            <div className="pointer-events-none absolute top-full left-1/2 -translate-x-1/2 mt-1 z-50 flex flex-col items-center opacity-0 translate-y-0 group-hover:opacity-100 group-hover:translate-y-0.5 transition-all duration-150 ease-out">
-              <div className="h-0 w-0 border-x-4 border-b-4 border-x-transparent border-b-gray-900/85" />
-              <div className="whitespace-nowrap rounded-md bg-gray-900/85 px-2.5 py-1 text-xs font-medium text-white shadow-xl backdrop-blur-md border border-white/10">
-                {item.tooltip}
+        {/* 모바일 화면에서는 공간 확보를 위해 상단 바 텍스트 메뉴 숨김 (PC 화면 md 이상에서만 표시) */}
+        <div className="hidden md:flex items-center gap-1">
+          {quickAppMenus.map((item) => (
+            <div key={item.id} className="relative group flex items-center">
+              <button
+                type="button"
+                className="px-2 py-0.5 rounded transition-colors font-medium hover:bg-white/30 cursor-pointer"
+                onClick={() => {
+                  setActiveMenu(null)
+                  item.action()
+                }}
+              >
+                {item.label}
+              </button>
+              {/* 한글 말풍선 (상단바 아래로 표시) */}
+              <div className="pointer-events-none absolute top-full left-1/2 -translate-x-1/2 mt-1 z-50 flex flex-col items-center opacity-0 translate-y-0 group-hover:opacity-100 group-hover:translate-y-0.5 transition-all duration-150 ease-out">
+                <div className="h-0 w-0 border-x-4 border-b-4 border-x-transparent border-b-gray-900/85" />
+                <div className="whitespace-nowrap rounded-md bg-gray-900/85 px-2.5 py-1 text-xs font-medium text-white shadow-xl backdrop-blur-md border border-white/10">
+                  {item.tooltip}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-1.5 md:gap-3 shrink-0">
         <button
           className="hover:bg-white/30 dark:hover:bg-white/10 p-1 rounded transition-colors"
           onClick={onControlCenterClick}
           title={controls.isMuted || controls.volume === 0 ? "Volume: Muted" : `Volume: ${controls.volume}%`}
         >
-          <StatusVolumeIcon className={`w-4 h-4 ${controls.isMuted || controls.volume === 0 ? "opacity-50" : ""}`} />
+          <StatusVolumeIcon className={`w-3.5 h-3.5 md:w-4 md:h-4 ${controls.isMuted || controls.volume === 0 ? "opacity-50" : ""}`} />
         </button>
         <button className="hover:bg-white/30 dark:hover:bg-white/10 p-1 rounded transition-colors" onClick={onSpotlightClick} title="Spotlight">
-          <Search className="w-4 h-4" />
+          <Search className="w-3.5 h-3.5 md:w-4 md:h-4" />
         </button>
         <button className="hover:bg-white/30 dark:hover:bg-white/10 p-1 rounded transition-colors" onClick={onControlCenterClick} title="Control Center">
-          <LayoutGrid className="w-4 h-4" />
+          <LayoutGrid className="w-3.5 h-3.5 md:w-4 md:h-4" />
         </button>
         <button
           className="hover:bg-white/30 dark:hover:bg-white/10 p-1 rounded transition-colors relative"
           onClick={onNotificationClick}
           title="알림"
         >
-          <BellIcon className="w-4 h-4" />
+          <BellIcon className="w-3.5 h-3.5 md:w-4 md:h-4" />
           {hasNotifications && (
             <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-blue-500 rounded-full ring-1 ring-white" />
           )}
         </button>
-        <span className="font-medium">{formatTime(currentTime)}</span>
+        <span className="font-medium text-xs md:text-sm whitespace-nowrap">{formatTime(currentTime)}</span>
       </div>
     </div>
   )
