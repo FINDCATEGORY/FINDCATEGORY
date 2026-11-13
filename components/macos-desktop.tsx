@@ -339,16 +339,16 @@ export function MacOSDesktop({ onRestart }: MacOSDesktopProps = {}) {
 
   const maximizeWindow = (id: string) => {
     setWindows(
-      windows.map((w) =>
-        w.id === id
-          ? {
-            ...w,
-            isMaximized: !w.isMaximized,
-            position: w.isMaximized ? w.position : { x: 0, y: 28 },
-            size: w.isMaximized ? w.size : { width: window.innerWidth, height: window.innerHeight - 28 - 80 },
-          }
-          : w,
-      ),
+      windows.map((w) => {
+        if (w.id !== id) return w
+        const topBarHeight = typeof window !== "undefined" && window.innerWidth < 768 ? 42 : 28
+        return {
+          ...w,
+          isMaximized: !w.isMaximized,
+          position: w.isMaximized ? w.position : { x: 0, y: topBarHeight },
+          size: w.isMaximized ? w.size : { width: window.innerWidth, height: window.innerHeight - topBarHeight - 80 },
+        }
+      }),
     )
   }
 

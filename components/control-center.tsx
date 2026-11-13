@@ -71,7 +71,7 @@ export function ControlCenter({ onClose }: ControlCenterProps) {
   return (
     <div className="fixed inset-0 z-[60]" onClick={onClose}>
       <div
-        className="absolute top-8 right-4 w-80 bg-[var(--macos-menu-bg)] macos-blur border border-black/10 dark:border-white/15 rounded-2xl shadow-2xl p-4 space-y-3 animate-scale-in text-slate-800 dark:text-zinc-100"
+        className="absolute top-12 md:top-8 right-2 md:right-4 w-[calc(100vw-1rem)] sm:w-80 bg-[var(--macos-menu-bg)] macos-blur border border-black/10 dark:border-white/15 rounded-2xl shadow-2xl p-4 space-y-3 animate-scale-in text-slate-800 dark:text-zinc-100"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Volume */}

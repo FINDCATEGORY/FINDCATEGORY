@@ -38,9 +38,8 @@ export function DesktopIcon({ icon, label, onDoubleClick, onClick }: DesktopIcon
 
   return (
     <button
-      className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors ${
-        isSelected ? "bg-blue-500/30" : "hover:bg-white/20"
-      }`}
+      className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors ${isSelected ? "bg-blue-500/30" : "hover:bg-white/20"
+        }`}
       onClick={handleClick}
     >
       {IconComponent ? (

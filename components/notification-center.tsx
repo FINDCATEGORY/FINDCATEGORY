@@ -191,7 +191,7 @@ export function NotificationCenter({ onClose }: NotificationCenterProps) {
   }
 
   return (
-    <div className="fixed top-7 right-0 w-[380px] h-[calc(100vh-1.75rem)] bg-white/95 dark:bg-zinc-900/95 macos-blur border-l border-gray-200/80 dark:border-zinc-800 shadow-2xl z-[60] flex flex-col animate-in slide-in-from-right duration-200 select-none">
+    <div className="fixed top-[42px] md:top-7 right-0 w-full sm:w-[380px] h-[calc(100vh-42px)] md:h-[calc(100vh-1.75rem)] bg-white/95 dark:bg-zinc-900/95 macos-blur border-l border-gray-200/80 dark:border-zinc-800 shadow-2xl z-[60] flex flex-col animate-in slide-in-from-right duration-200 select-none">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-zinc-800 shrink-0">
         <div className="flex items-center gap-2">

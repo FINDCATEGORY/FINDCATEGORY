@@ -90,11 +90,16 @@ export function MenuBar({
 
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+    })
+  }
+
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString("en-US", {
       weekday: "short",
       month: "short",
       day: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
     })
   }
 
@@ -117,7 +122,7 @@ export function MenuBar({
       label: <CustomLogoIcon />,
       items: appleMenuItems,
     },
-    { id: "app", label: <span className="font-bold tracking-tight">FINDCATEGORY</span>, items: appMenuItems },
+    { id: "app", label: <span className="font-bold tracking-tight text-[15px] md:text-sm">FINDCATEGORY</span>, items: appMenuItems },
   ]
 
   const quickAppMenus = [
@@ -130,12 +135,12 @@ export function MenuBar({
   ]
 
   return (
-    <div className="h-7 bg-[var(--macos-menu-bg)] macos-blur border-b border-black/10 dark:border-white/10 flex items-center justify-between px-2 md:px-4 relative z-50 text-xs md:text-sm text-slate-900 dark:text-zinc-100 select-none">
-      <div className="flex items-center gap-1 shrink-0">
+    <div className="h-[42px] md:h-7 bg-[var(--macos-menu-bg)] macos-blur border-b border-black/10 dark:border-white/10 flex items-center justify-between px-2.5 md:px-4 relative z-50 text-slate-900 dark:text-zinc-100 select-none">
+      <div className="flex items-center gap-1.5 md:gap-1 shrink-0">
         {menus.map((menu) => (
           <div key={menu.id} className="relative shrink-0">
             <button
-              className={`px-1.5 md:px-2 py-0.5 rounded transition-colors font-medium flex items-center shrink-0 ${
+              className={`px-2 py-1 md:py-0.5 rounded-md md:rounded transition-colors font-medium flex items-center shrink-0 ${
                 activeMenu === menu.id ? "bg-blue-500 text-white" : "hover:bg-white/30"
               }`}
               onClick={() => setActiveMenu(activeMenu === menu.id ? null : menu.id)}
@@ -174,31 +179,34 @@ export function MenuBar({
         </div>
       </div>
 
-      <div className="flex items-center gap-1.5 md:gap-3 shrink-0">
+      <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 shrink-0">
         <button
-          className="hover:bg-white/30 dark:hover:bg-white/10 p-1 rounded transition-colors"
+          className="hover:bg-white/30 dark:hover:bg-white/10 p-1.5 md:p-1 rounded transition-colors"
           onClick={onControlCenterClick}
           title={controls.isMuted || controls.volume === 0 ? "Volume: Muted" : `Volume: ${controls.volume}%`}
         >
-          <StatusVolumeIcon className={`w-3.5 h-3.5 md:w-4 md:h-4 ${controls.isMuted || controls.volume === 0 ? "opacity-50" : ""}`} />
+          <StatusVolumeIcon className={`w-5 h-5 md:w-4 md:h-4 ${controls.isMuted || controls.volume === 0 ? "opacity-50" : ""}`} />
         </button>
-        <button className="hover:bg-white/30 dark:hover:bg-white/10 p-1 rounded transition-colors" onClick={onSpotlightClick} title="Spotlight">
-          <Search className="w-3.5 h-3.5 md:w-4 md:h-4" />
+        <button className="hover:bg-white/30 dark:hover:bg-white/10 p-1.5 md:p-1 rounded transition-colors" onClick={onSpotlightClick} title="Spotlight">
+          <Search className="w-5 h-5 md:w-4 md:h-4" />
         </button>
-        <button className="hover:bg-white/30 dark:hover:bg-white/10 p-1 rounded transition-colors" onClick={onControlCenterClick} title="Control Center">
-          <LayoutGrid className="w-3.5 h-3.5 md:w-4 md:h-4" />
+        <button className="hover:bg-white/30 dark:hover:bg-white/10 p-1.5 md:p-1 rounded transition-colors" onClick={onControlCenterClick} title="Control Center">
+          <LayoutGrid className="w-5 h-5 md:w-4 md:h-4" />
         </button>
         <button
-          className="hover:bg-white/30 dark:hover:bg-white/10 p-1 rounded transition-colors relative"
+          className="hover:bg-white/30 dark:hover:bg-white/10 p-1.5 md:p-1 rounded transition-colors relative"
           onClick={onNotificationClick}
           title="알림"
         >
-          <BellIcon className="w-3.5 h-3.5 md:w-4 md:h-4" />
+          <BellIcon className="w-5 h-5 md:w-4 md:h-4" />
           {hasNotifications && (
-            <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-blue-500 rounded-full ring-1 ring-white" />
+            <span className="absolute top-1.5 right-1.5 md:top-1 md:right-1 w-2 h-2 md:w-1.5 md:h-1.5 bg-blue-500 rounded-full ring-1 ring-white" />
           )}
         </button>
-        <span className="font-medium text-xs md:text-sm whitespace-nowrap">{formatTime(currentTime)}</span>
+        <span className="font-medium text-xs md:text-sm whitespace-nowrap">
+          <span className="hidden sm:inline">{formatDate(currentTime)} </span>
+          <span>{formatTime(currentTime)}</span>
+        </span>
       </div>
     </div>
   )

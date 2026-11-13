@@ -322,7 +322,7 @@ export function NotificationBanner() {
   return (
     <aside
       aria-label="macOS 실시간 알림 센터"
-      className="fixed top-10 right-4 z-[9999] flex flex-col items-end gap-2.5 pointer-events-none select-none max-w-[360px] w-full"
+      className="fixed top-12 md:top-10 right-4 z-[9999] flex flex-col items-end gap-2.5 pointer-events-none select-none max-w-[360px] w-full"
     >
       {/* 2개 이상일 때 '모두 지우기' 옵션 제공 */}
       {notifications.length > 1 && (

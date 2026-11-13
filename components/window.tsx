@@ -87,7 +87,8 @@ export function Window({
     const handleMouseMove = (e: MouseEvent) => {
       const { startMouseX, startMouseY, originX, originY } = dragStateRef.current
       dragStateRef.current.currentX = originX + (e.clientX - startMouseX)
-      dragStateRef.current.currentY = Math.max(28, originY + (e.clientY - startMouseY))
+      const topBarHeight = typeof window !== "undefined" && window.innerWidth < 768 ? 42 : 28
+      dragStateRef.current.currentY = Math.max(topBarHeight, originY + (e.clientY - startMouseY))
       if (rafId === null) {
         rafId = requestAnimationFrame(applyDragTransform)
       }
