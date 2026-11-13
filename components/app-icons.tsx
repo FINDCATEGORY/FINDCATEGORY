@@ -80,11 +80,18 @@ export const LaunchpadIcon = () => (
   </div>
 )
 
-export const FolderIcon = () => (
-  <div className="w-full h-full rounded-[22%] overflow-hidden">
-    <img src="https://blob.v0.app/your-folder-image-url.jpg" alt="Folder" className="w-full h-full object-cover" />
+export const MacOSFolderIcon = ({ className }: { className?: string }) => (
+  <div className={`w-full h-full flex items-center justify-center select-none ${className || ""}`}>
+    <img
+      src="/macos-folder.png"
+      alt="macOS Folder"
+      className="w-full h-full object-contain filter drop-shadow-[0_4px_8px_rgba(0,0,0,0.18)] transition-transform duration-150 hover:scale-105"
+      draggable={false}
+    />
   </div>
 )
+
+export const FolderIcon = MacOSFolderIcon
 
 export const DocumentsIcon = () => (
   <div className="w-full h-full rounded-[22%] overflow-hidden">
@@ -96,10 +103,5 @@ export const DocumentsIcon = () => (
   </div>
 )
 
-export const DownloadsIcon = () => (
-  <div className="w-full h-full rounded-[22%] bg-gradient-to-b from-blue-400 to-blue-600 flex items-center justify-center shadow-lg overflow-hidden">
-    <svg viewBox="0 0 64 64" className="w-3/4 h-3/4" fill="white">
-      <path d="M8 16c0-2.21 1.79-4 4-4h16l4 4h20c2.21 0 4 1.79 4 4v28c0 2.21-1.79 4-4 4H12c-2.21 0-4-1.79-4-4V16z" />
-    </svg>
-  </div>
-)
+export const DownloadsIcon = MacOSFolderIcon
+

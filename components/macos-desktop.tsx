@@ -30,7 +30,7 @@ import { Terminal } from "./apps/terminal"
 import { Docker } from "./apps/docker"
 import { GitBash } from "./apps/git-bash"
 import { QuickTimePlayer } from "./apps/quicktime-player"
-import { DownloadsIcon, NotesIcon } from "./app-icons"
+import { MacOSFolderIcon, NotesIcon } from "./app-icons"
 import { ClockWidget } from "./widgets/clock-widget"
 import { CalendarWidget } from "./widgets/calendar-widget"
 import { AnimatedWallpaper } from "./animated-wallpaper"
@@ -446,8 +446,8 @@ export function MacOSDesktop({ onRestart }: MacOSDesktopProps = {}) {
 
       <div className="absolute inset-0" onContextMenu={handleDesktopContextMenu}>
         <div className="absolute top-20 md:top-32 right-4 md:right-8 flex flex-col gap-4 md:gap-6">
-          <DesktopIcon icon={DownloadsIcon} label="브랜드 영상" onDoubleClick={() => openApp("finder", "브랜드 영상")} />
-          <DesktopIcon icon={DownloadsIcon} label="브랜드 조사 신청" onDoubleClick={() => openApp("finder", "브랜드 조사 신청")} />
+          <DesktopIcon icon={MacOSFolderIcon} label="브랜드 영상" onDoubleClick={() => openApp("finder", "브랜드 영상")} />
+          <DesktopIcon icon={MacOSFolderIcon} label="브랜드 조사 신청" onDoubleClick={() => openApp("finder", "브랜드 조사 신청")} />
         </div>
 
         <div className="absolute bottom-20 md:bottom-32 left-4 md:left-8 flex flex-col gap-3 md:gap-4 items-start">
