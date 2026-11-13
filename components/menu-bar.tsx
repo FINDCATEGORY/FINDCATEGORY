@@ -1,10 +1,9 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Search, BellIcon, LayoutGrid, Volume2, Volume1, VolumeX } from "lucide-react"
+import { Search, BellIcon, Settings } from "lucide-react"
 import { CustomLogoIcon } from "./custom-logo"
 import type { AppType } from "./macos-desktop"
-import { useSystemControls } from "@/lib/system-controls"
 import {
   NOTIFICATION_CENTER_UPDATED_EVENT,
   getStoredNotificationCenterItems,
@@ -64,14 +63,6 @@ export function MenuBar({
 }: MenuBarProps) {
   const [activeMenu, setActiveMenu] = useState<string | null>(null)
   const [hasNotifications, setHasNotifications] = useState(false)
-  const { controls } = useSystemControls()
-
-  const StatusVolumeIcon =
-    controls.isMuted || controls.volume === 0
-      ? VolumeX
-      : controls.volume < 50
-      ? Volume1
-      : Volume2
 
   useEffect(() => {
     const checkCount = () => {
@@ -182,15 +173,12 @@ export function MenuBar({
         <button
           className="hover:bg-white/30 dark:hover:bg-white/10 p-1.5 md:p-1 rounded transition-colors"
           onClick={onControlCenterClick}
-          title={controls.isMuted || controls.volume === 0 ? "Volume: Muted" : `Volume: ${controls.volume}%`}
+          title="제어 센터"
         >
-          <StatusVolumeIcon className={`w-5 h-5 md:w-4 md:h-4 ${controls.isMuted || controls.volume === 0 ? "opacity-50" : ""}`} />
+          <Settings className="w-5 h-5 md:w-4 md:h-4" />
         </button>
         <button className="hover:bg-white/30 dark:hover:bg-white/10 p-1.5 md:p-1 rounded transition-colors" onClick={onSpotlightClick} title="Spotlight">
           <Search className="w-5 h-5 md:w-4 md:h-4" />
-        </button>
-        <button className="hover:bg-white/30 dark:hover:bg-white/10 p-1.5 md:p-1 rounded transition-colors" onClick={onControlCenterClick} title="Control Center">
-          <LayoutGrid className="w-5 h-5 md:w-4 md:h-4" />
         </button>
         <button
           className="hover:bg-white/30 dark:hover:bg-white/10 p-1.5 md:p-1 rounded transition-colors relative"
