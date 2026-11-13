@@ -89,10 +89,9 @@ export function MenuBar({
   }, [])
 
   const formatTime = (date: Date) => {
-    return date.toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-    })
+    const hours = String(date.getHours()).padStart(2, "0")
+    const minutes = String(date.getMinutes()).padStart(2, "0")
+    return `${hours}:${minutes}`
   }
 
   const formatDate = (date: Date) => {
