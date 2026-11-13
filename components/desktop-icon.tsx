@@ -39,7 +39,7 @@ export function DesktopIcon({ icon, label, onDoubleClick, onClick }: DesktopIcon
   return (
     <button
       type="button"
-      className={`flex flex-col items-center gap-1.5 p-2 rounded-lg transition-colors cursor-pointer focus:outline-none select-none ${isSelected ? "bg-blue-500/30" : "hover:bg-white/20"
+      className={`flex flex-col items-center gap-1.5 p-2 rounded-lg transition-colors cursor-pointer focus:outline-none select-none ${isSelected ? "bg-blue-500/25 ring-1 ring-blue-500/40" : "hover:bg-black/5"
         }`}
       onClick={handleClick}
     >
@@ -50,7 +50,7 @@ export function DesktopIcon({ icon, label, onDoubleClick, onClick }: DesktopIcon
       ) : (
         <div className="text-5xl">{typeof icon === "string" ? icon : null}</div>
       )}
-      <span className="text-xs font-medium text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] text-center leading-tight">
+      <span className="text-xs font-semibold text-slate-800 drop-shadow-[0_1px_2px_rgba(255,255,255,0.9)] text-center leading-tight">
         {label}
       </span>
     </button>

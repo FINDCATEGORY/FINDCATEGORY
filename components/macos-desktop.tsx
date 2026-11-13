@@ -440,8 +440,8 @@ export function MacOSDesktop({ onRestart }: MacOSDesktopProps = {}) {
   }
 
   return (
-    <div className="h-screen w-screen overflow-hidden relative bg-gradient-to-br from-blue-400 via-purple-300 to-pink-300">
-      <div className="absolute inset-0 bg-gradient-to-br from-[#0a1628] via-[#1e3a5f] to-[#2d5a7b]" />
+    <div className="h-screen w-screen overflow-hidden relative bg-gradient-to-br from-white via-slate-100 to-gray-200">
+      <div className="absolute inset-0 bg-gradient-to-br from-white via-[#f1f3f6] to-[#d8dce2]" />
       <AnimatedWallpaper />
 
       <div className="absolute inset-0" onContextMenu={handleDesktopContextMenu}>
