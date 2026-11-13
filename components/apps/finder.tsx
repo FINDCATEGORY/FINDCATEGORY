@@ -817,9 +817,6 @@ export function Finder({ initialFolder = "All Brands", navigationRequestId, onOp
       return (
         <div className="relative flex items-center justify-center">
           <Folder className={`${isLarge ? "w-14 h-14" : "w-6 h-6"} text-sky-500 fill-sky-400 drop-shadow-sm`} />
-          {item.targetFolderId && (
-            <span className="absolute text-[9px] font-bold text-white tracking-tighter mt-1">BRAND</span>
-          )}
         </div>
       )
     }
