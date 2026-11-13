@@ -303,12 +303,12 @@ export function NotificationBanner() {
         playMacOSChime()
       }
 
-      // 사용자가 클릭해서 닫을 때까지 화면에 유지 (자동 소멸 타이머 제거)
-      if (notif.duration && notif.duration > 0) {
-        setTimeout(() => {
-          removeNotification(notif.id)
-        }, notif.duration)
-      }
+      // 알림 배너 자동 소멸 타이머: 기본 5초(5000ms) 후 자동으로 사라지며, 명시적 duration 지정 시 해당 시간 적용
+      const autoCloseDuration =
+        notif.duration !== undefined && notif.duration > 0 ? notif.duration : 5000
+      setTimeout(() => {
+        removeNotification(notif.id)
+      }, autoCloseDuration)
     }
 
     window.addEventListener(MACOS_NOTIFICATION_EVENT, handleNewNotification)

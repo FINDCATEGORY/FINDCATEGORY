@@ -64,6 +64,16 @@ export const DEFAULT_NOTIFICATION_TEMPLATES: NotificationTemplate[] = [
     variablesHelp: "{nickname} : 로그인한 회원의 닉네임",
   },
   {
+    id: "logout",
+    label: "로그아웃 알림",
+    category: "system",
+    app: "FIND_CATEGORY",
+    title: "로그아웃 완료",
+    message: "안전하게 로그아웃되었습니다. 비회원 게스트 모드로 전환됩니다.",
+    iconType: "findcategory",
+    description: "회원 또는 관리자 계정에서 로그아웃했을 때 표시되는 안내 알림입니다.",
+  },
+  {
     id: "review_created",
     label: "한 줄 평 등록 완료 알림",
     category: "finder",

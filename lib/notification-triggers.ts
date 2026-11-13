@@ -19,6 +19,7 @@ export type NotificationTriggerId =
   | "welcome"
   | "auth_required"
   | "login"
+  | "logout"
   | "signup"
   | "folder_created"
   | "folder_deleted"
@@ -92,6 +93,16 @@ export const NOTIFICATION_TRIGGER_CHART: NotificationTriggerMeta[] = [
     condition: "Settings에서 회원 또는 관리자 계정으로 로그인에 성공할 때 팝업됩니다.",
     exampleTitle: "로그인 성공",
     defaultEnabled: true,
+  },
+  {
+    id: "logout",
+    category: "system",
+    app: "Settings",
+    iconType: "settings",
+    name: "로그아웃",
+    condition: "계정에서 로그아웃할 때 팝업됩니다.",
+    exampleTitle: "로그아웃 완료",
+    defaultEnabled: false,
   },
   {
     id: "signup",
@@ -275,6 +286,7 @@ export function inferNotificationTriggerId(payload: {
   if (title.includes("로그인이 필요합니다")) return "auth_required"
   if (title.includes("관리자 권한 필요")) return "settings_system"
   if (title.includes("로그인 성공") || title.includes("로그인 완료")) return "login"
+  if (title.includes("로그아웃")) return "logout"
   if (title.includes("회원가입 완료")) return "signup"
   if (title.includes("브랜드 조사 신청 삭제")) return "request_deleted"
   if (title.includes("브랜드 조사 신청")) return "request_created"

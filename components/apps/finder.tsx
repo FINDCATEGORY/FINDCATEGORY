@@ -655,6 +655,7 @@ export function Finder({ initialFolder = "All Brands", navigationRequestId, onOp
   useEffect(() => {
     if (
       initialFolder === "Open Request" ||
+      initialFolder === "브랜드 신청" ||
       initialFolder === "브랜드 조사 신청" ||
       initialFolder === "브랜드 조사 신청하기"
     ) {
@@ -877,33 +878,33 @@ export function Finder({ initialFolder = "All Brands", navigationRequestId, onOp
   }
 
   return (
-    <div className="w-full h-full flex bg-slate-50 dark:bg-zinc-950 font-sans select-none overflow-hidden text-slate-800 dark:text-zinc-100">
-      {/* ───────────────── SIDEBAR ───────────────── */}
-      <div className="w-56 bg-slate-100/70 dark:bg-zinc-900/70 backdrop-blur-md border-r border-slate-200 dark:border-zinc-800 flex flex-col justify-between p-3 shrink-0">
-        <div className="space-y-4">
-          {/* Brand Archive 구역 (All Brands, 브랜드 조사 신청) */}
-          <div>
-            <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500 mb-1.5 px-2.5">
+    <div className="w-full h-full flex flex-col landscape:flex-row md:flex-row bg-slate-50 dark:bg-zinc-950 font-sans select-none overflow-hidden text-slate-800 dark:text-zinc-100">
+      {/* ───────────────── SIDEBAR (모바일 세로: 숨김 처리, 모바일 가로/PC: 좌측 바) ───────────────── */}
+      <div className="hidden landscape:flex md:flex w-full landscape:w-56 md:w-56 bg-slate-100/90 dark:bg-zinc-900/90 backdrop-blur-md border-b landscape:border-b-0 landscape:border-r md:border-b-0 md:border-r border-slate-200 dark:border-zinc-800 flex-col justify-between p-2 landscape:p-3 md:p-3 shrink-0 z-10 gap-1.5 landscape:gap-4 md:gap-4">
+        <div className="flex flex-col gap-1.5 landscape:space-y-4 md:space-y-4 w-full">
+          {/* 1행: 브랜드 영상보기 & 브랜드 신청 (모바일에서는 한 줄에 50%씩 반반 차지) */}
+          <div className="flex flex-col w-full">
+            <div className="hidden landscape:block md:block text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500 mb-1.5 px-2.5">
               <span>Brand Archive</span>
             </div>
-            <div className="space-y-0.5">
-              {/* All Brands */}
+            <div className="grid grid-cols-2 landscape:flex md:flex landscape:flex-col md:flex-col gap-1.5 landscape:space-y-0.5 md:space-y-0.5 w-full">
+              {/* All Brands (브랜드 영상보기) */}
               <button
                 onClick={() => navigateTo("all-brands")}
-                className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-[13px] font-medium transition-colors ${
+                className={`flex items-center justify-between gap-1.5 px-2.5 md:px-3 py-1.5 rounded-lg text-xs md:text-[13px] font-medium transition-colors shrink-0 whitespace-nowrap cursor-pointer w-full ${
                   currentFolderId === "all-brands"
                     ? "bg-blue-600 text-white shadow-sm font-semibold"
-                    : "text-slate-700 dark:text-zinc-200 hover:bg-slate-200/60 dark:hover:bg-zinc-800"
+                    : "text-slate-700 dark:text-zinc-200 hover:bg-slate-200/60 dark:hover:bg-zinc-800 bg-white/70 dark:bg-zinc-800/70 landscape:bg-transparent md:bg-transparent"
                 }`}
               >
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 md:gap-2 truncate">
                   <Folder
-                    className={`w-4 h-4 ${currentFolderId === "all-brands" ? "text-white" : "text-blue-500"}`}
+                    className={`w-3.5 h-3.5 md:w-4 md:h-4 shrink-0 ${currentFolderId === "all-brands" ? "text-white" : "text-blue-500"}`}
                   />
-                  <span>브랜드 영상보기</span>
+                  <span className="truncate">브랜드 영상보기</span>
                 </div>
                 <span
-                  className={`text-[11px] px-1.5 py-0.2 rounded-full ${
+                  className={`text-[10px] md:text-[11px] px-1.5 py-0.2 rounded-full shrink-0 ${
                     currentFolderId === "all-brands"
                       ? "bg-blue-500 text-white"
                       : "bg-slate-200 dark:bg-zinc-800 text-slate-500"
@@ -916,20 +917,20 @@ export function Finder({ initialFolder = "All Brands", navigationRequestId, onOp
               {/* 브랜드 조사 신청하기 */}
               <button
                 onClick={() => navigateTo("open-request")}
-                className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-[13px] font-medium transition-colors ${
+                className={`flex items-center justify-between gap-1.5 px-2.5 md:px-3 py-1.5 rounded-lg text-xs md:text-[13px] font-medium transition-colors shrink-0 whitespace-nowrap cursor-pointer w-full ${
                   currentFolderId === "open-request"
                     ? "bg-blue-600 text-white shadow-sm font-semibold"
-                    : "text-slate-700 dark:text-zinc-200 hover:bg-slate-200/60 dark:hover:bg-zinc-800"
+                    : "text-slate-700 dark:text-zinc-200 hover:bg-slate-200/60 dark:hover:bg-zinc-800 bg-white/70 dark:bg-zinc-800/70 landscape:bg-transparent md:bg-transparent"
                 }`}
               >
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 md:gap-2 truncate">
                   <MessageSquarePlus
-                    className={`w-4 h-4 ${currentFolderId === "open-request" ? "text-white" : "text-violet-500"}`}
+                    className={`w-3.5 h-3.5 md:w-4 md:h-4 shrink-0 ${currentFolderId === "open-request" ? "text-white" : "text-violet-500"}`}
                   />
-                  <span>브랜드 조사 신청하기</span>
+                  <span className="truncate">브랜드 신청</span>
                 </div>
                 <span
-                  className={`text-[11px] px-1.5 py-0.2 rounded-full ${
+                  className={`text-[10px] md:text-[11px] px-1.5 py-0.2 rounded-full shrink-0 ${
                     currentFolderId === "open-request"
                       ? "bg-blue-500 text-white"
                       : "bg-slate-200 dark:bg-zinc-800 text-slate-500"
@@ -941,15 +942,16 @@ export function Finder({ initialFolder = "All Brands", navigationRequestId, onOp
             </div>
           </div>
 
-          {/* Quick Curated Brands */}
+          {/* Quick Curated Brands (모바일 세로 버전에서는 숨김 처리, PC 및 가로 모드 좌측 사이드바에서만 노출) */}
           {allBrandsList.length > 0 && (
-            <div>
+            <div className="hidden landscape:flex md:flex flex-col w-full">
               <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500 mb-1.5 px-2.5">
                 Curated Contents
               </div>
-              <div className="space-y-0.5">
+              <div className="flex flex-row landscape:flex-col md:flex-col items-center landscape:items-stretch md:items-stretch gap-1.5 landscape:space-y-0.5 md:space-y-0.5 overflow-x-auto landscape:overflow-x-visible md:overflow-x-visible scrollbar-none scroll-smooth py-0.5 px-0.5 w-full">
                 {allBrandsList.map((brand) => {
                   const targetId = brand.targetFolderId || brand.id
+                  const isCuratedActive = currentFolderId === targetId
                   const dotColor =
                     targetId === "brand-patagonia"
                       ? "bg-emerald-500"
@@ -962,10 +964,14 @@ export function Finder({ initialFolder = "All Brands", navigationRequestId, onOp
                     <button
                       key={brand.id}
                       onClick={() => navigateTo(targetId)}
-                      className="w-full flex items-center gap-2 px-2.5 py-1 rounded-md text-xs text-slate-600 dark:text-zinc-300 hover:bg-slate-200/50"
+                      className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs transition-colors shrink-0 whitespace-nowrap cursor-pointer ${
+                        isCuratedActive
+                          ? "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300 font-semibold"
+                          : "text-slate-600 dark:text-zinc-300 hover:bg-slate-200/50 bg-white/70 dark:bg-zinc-800/70 landscape:bg-transparent md:bg-transparent"
+                      }`}
                     >
-                      <span className={`w-2 h-2 rounded-full ${dotColor}`} />
-                      <span className="truncate">{brand.name}</span>
+                      <span className={`w-2 h-2 rounded-full shrink-0 ${dotColor}`} />
+                      <span className="truncate max-w-[130px]">{brand.name}</span>
                     </button>
                   )
                 })}
@@ -974,8 +980,8 @@ export function Finder({ initialFolder = "All Brands", navigationRequestId, onOp
           )}
         </div>
 
-        {/* 사이드바 하단 정보 */}
-        <div className="border-t border-slate-200 dark:border-zinc-800 pt-2 px-2">
+        {/* 사이드바 하단 정보 (PC 및 모바일 가로에서만 표시) */}
+        <div className="hidden landscape:block md:block border-t border-slate-200 dark:border-zinc-800 pt-2 px-2">
           <div className="flex items-center gap-2 text-[11px] text-slate-400">
             <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
             <span>Archive Live Sync</span>
@@ -985,15 +991,15 @@ export function Finder({ initialFolder = "All Brands", navigationRequestId, onOp
 
       {/* ───────────────── MAIN FILE VIEW ───────────────── */}
       <div className="flex-1 flex flex-col h-full overflow-hidden bg-white dark:bg-zinc-900">
-        {/* macOS 정밀 툴바 (Navigation, Breadcrumb, View Toggle, Search) */}
-        <div className="h-13 border-b border-slate-200 dark:border-zinc-800 flex items-center justify-between px-4 bg-slate-50/50 dark:bg-zinc-900/50 shrink-0">
+        {/* macOS 정밀 툴바 (Navigation, Breadcrumb, View Toggle, Search - 모바일에서도 한 줄 완벽 정렬) */}
+        <div className="h-11 border-b border-slate-200 dark:border-zinc-800 flex items-center justify-between px-2.5 md:px-4 bg-slate-50/50 dark:bg-zinc-900/50 shrink-0 gap-1.5 md:gap-2 flex-nowrap overflow-x-auto scrollbar-none">
           {/* 뒤로가기/앞으로가기 및 경로 브레드크럼 */}
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5 md:gap-3 shrink-0 min-w-0">
+            <div className="flex items-center gap-0.5 shrink-0">
               <button
                 onClick={goBack}
                 disabled={historyIndex === 0}
-                className="p-1 rounded hover:bg-slate-200/70 dark:hover:bg-zinc-800 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+                className="p-1 rounded hover:bg-slate-200/70 dark:hover:bg-zinc-800 disabled:opacity-30 disabled:hover:bg-transparent transition-colors cursor-pointer"
                 title="Back"
               >
                 <ChevronLeft className="w-4 h-4 text-slate-600 dark:text-zinc-300" />
@@ -1001,27 +1007,29 @@ export function Finder({ initialFolder = "All Brands", navigationRequestId, onOp
               <button
                 onClick={goForward}
                 disabled={historyIndex >= folderHistory.length - 1}
-                className="p-1 rounded hover:bg-slate-200/70 dark:hover:bg-zinc-800 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+                className="p-1 rounded hover:bg-slate-200/70 dark:hover:bg-zinc-800 disabled:opacity-30 disabled:hover:bg-transparent transition-colors cursor-pointer"
                 title="Forward"
               >
                 <ChevronRight className="w-4 h-4 text-slate-600 dark:text-zinc-300" />
               </button>
             </div>
 
-            <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-zinc-400">
+            <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-zinc-400 min-w-0 truncate">
               <button
                 onClick={() => navigateTo("all-brands")}
-                className="hover:text-blue-600 font-medium transition-colors"
+                className="hover:text-blue-600 font-medium transition-colors shrink-0 hidden sm:inline"
               >
                 Brand Library
               </button>
-              <ChevronRight className="w-3 h-3 text-slate-400" />
-              <span className="font-semibold text-slate-800 dark:text-zinc-100">{getFolderDisplayName()}</span>
+              <ChevronRight className="w-3 h-3 text-slate-400 shrink-0 hidden sm:inline" />
+              <span className="font-semibold text-slate-800 dark:text-zinc-100 truncate max-w-[100px] sm:max-w-none">
+                {getFolderDisplayName()}
+              </span>
             </div>
           </div>
 
-          {/* 우측 도구: 검색 및 뷰 모드 토글 */}
-          <div className="flex items-center gap-2">
+          {/* 우측 도구: 브랜드 검색 및 뷰 모드 토글 (모바일 1줄 유지) */}
+          <div className="flex items-center gap-1.5 md:gap-2 shrink-0">
             {/* 관리자 전용 선택 폴더 삭제 버튼 */}
             {isAdmin && currentFolderId === "all-brands" && selectedItemId && (
               <button
@@ -1032,11 +1040,11 @@ export function Finder({ initialFolder = "All Brands", navigationRequestId, onOp
                     handleDeleteBrandFolder(target.id, target.name, e)
                   }
                 }}
-                className="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200/60 dark:border-rose-900/60 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
+                className="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200/60 dark:border-rose-900/60 rounded-lg text-xs font-medium flex items-center gap-1 transition-colors cursor-pointer shrink-0"
                 title="선택한 브랜드 폴더 삭제 (관리자 전용)"
               >
                 <Trash2 className="w-3.5 h-3.5" />
-                <span>선택 폴더 삭제</span>
+                <span className="hidden sm:inline">선택 폴더 삭제</span>
               </button>
             )}
 
@@ -1050,11 +1058,11 @@ export function Finder({ initialFolder = "All Brands", navigationRequestId, onOp
                   const folderId = target ? target.id : currentFolderId
                   handleDeleteBrandFolder(folderId, folderName, e)
                 }}
-                className="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200/60 dark:border-rose-900/60 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
+                className="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200/60 dark:border-rose-900/60 rounded-lg text-xs font-medium flex items-center gap-1 transition-colors cursor-pointer shrink-0"
                 title="현재 열려있는 브랜드 폴더 삭제 (관리자 전용)"
               >
                 <Trash2 className="w-3.5 h-3.5" />
-                <span>폴더 삭제</span>
+                <span className="hidden sm:inline">폴더 삭제</span>
               </button>
             )}
 
@@ -1068,33 +1076,33 @@ export function Finder({ initialFolder = "All Brands", navigationRequestId, onOp
                     handleDeleteBrandRequest(target.id, target.name, e)
                   }
                 }}
-                className="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200/60 dark:border-rose-900/60 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
+                className="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200/60 dark:border-rose-900/60 rounded-lg text-xs font-medium flex items-center gap-1 transition-colors cursor-pointer shrink-0"
                 title="선택한 브랜드 조사 신청 항목 삭제 (관리자 전용)"
               >
                 <Trash2 className="w-3.5 h-3.5" />
-                <span>신청 삭제</span>
+                <span className="hidden sm:inline">신청 삭제</span>
               </button>
             )}
 
-            <div className="flex items-center gap-1.5 bg-slate-200/60 dark:bg-zinc-800 rounded-lg px-2.5 py-1 text-xs">
-              <Search className="w-3.5 h-3.5 text-slate-400" />
+            <div className="flex items-center gap-1.5 bg-slate-200/60 dark:bg-zinc-800 rounded-lg px-2 py-1 text-xs shrink-0">
+              <Search className="w-3.5 h-3.5 text-slate-400 shrink-0" />
               <input
                 type="text"
-                placeholder="파일 검색..."
-                className="bg-transparent outline-none w-28 text-slate-800 dark:text-zinc-100 placeholder:text-slate-400"
+                placeholder="브랜드 검색"
+                className="bg-transparent outline-none w-20 sm:w-28 text-slate-800 dark:text-zinc-100 placeholder:text-slate-400 text-xs"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
               {searchQuery && (
-                <button onClick={() => setSearchQuery("")}>
+                <button onClick={() => setSearchQuery("")} className="shrink-0 cursor-pointer">
                   <X className="w-3 h-3 text-slate-400 hover:text-slate-600" />
                 </button>
               )}
             </div>
 
-            <div className="flex items-center bg-slate-200/60 dark:bg-zinc-800 rounded-lg p-0.5">
+            <div className="flex items-center bg-slate-200/60 dark:bg-zinc-800 rounded-lg p-0.5 shrink-0">
               <button
-                className={`p-1 rounded-md transition-colors ${
+                className={`p-1 rounded-md transition-colors cursor-pointer ${
                   viewMode === "list"
                     ? "bg-white dark:bg-zinc-700 shadow-sm text-slate-800 dark:text-zinc-100"
                     : "text-slate-500"
@@ -1105,7 +1113,7 @@ export function Finder({ initialFolder = "All Brands", navigationRequestId, onOp
                 <List className="w-3.5 h-3.5" />
               </button>
               <button
-                className={`p-1 rounded-md transition-colors ${
+                className={`p-1 rounded-md transition-colors cursor-pointer ${
                   viewMode === "grid"
                     ? "bg-white dark:bg-zinc-700 shadow-sm text-slate-800 dark:text-zinc-100"
                     : "text-slate-500"
@@ -1119,9 +1127,9 @@ export function Finder({ initialFolder = "All Brands", navigationRequestId, onOp
           </div>
         </div>
 
-        {/* ───────────────── 상단 비주얼 소개 배너 ───────────────── */}
+        {/* ───────────────── 상단 비주얼 소개 배너 (모바일에서는 숨김, PC 및 가로 모드에서만 표시) ───────────────── */}
         {currentFolderId === "all-brands" && (
-          <div className="bg-gradient-to-r from-blue-50/80 via-indigo-50/50 to-slate-50 border-b border-blue-100/70 dark:from-blue-950/20 dark:via-zinc-900 dark:to-zinc-900 dark:border-zinc-800 px-4 py-2.5 flex items-center justify-between text-xs shrink-0 flex-wrap gap-2">
+          <div className="hidden md:flex bg-gradient-to-r from-blue-50/80 via-indigo-50/50 to-slate-50 border-b border-blue-100/70 dark:from-blue-950/20 dark:via-zinc-900 dark:to-zinc-900 dark:border-zinc-800 px-4 py-2.5 items-center justify-between text-xs shrink-0 flex-wrap gap-2">
             <div className="flex items-center gap-2 text-slate-700 dark:text-zinc-200">
               <Sparkles className="w-4 h-4 text-blue-600 shrink-0" />
               <span>
@@ -1176,17 +1184,18 @@ export function Finder({ initialFolder = "All Brands", navigationRequestId, onOp
 
         {/* 안내 배너 (브랜드 조사 신청하기 폴더일 경우) */}
         {currentFolderId === "open-request" && (
-          <div className="bg-gradient-to-r from-violet-50 via-purple-50 to-indigo-50 dark:from-violet-950/40 dark:via-purple-950/30 dark:to-indigo-950/40 border-b border-violet-100 dark:border-violet-900/40 px-4 py-2.5 flex items-center justify-between text-xs shrink-0 flex-wrap gap-2">
-            <div className="flex items-center gap-2 text-violet-800 dark:text-violet-300">
+          <div className="bg-slate-50/80 dark:bg-zinc-900/60 border-b border-slate-200/80 dark:border-zinc-800 px-3 md:px-4 py-1.5 md:py-2.5 flex items-center justify-between text-xs shrink-0 flex-wrap gap-2">
+            {/* 안내 문구 (모바일에서는 숨김, PC에서만 표시) */}
+            <div className="hidden md:flex items-center gap-2 text-violet-800 dark:text-violet-300">
               <MessageSquarePlus className="w-4 h-4 text-violet-600 shrink-0" />
               <span>
                 <strong>브랜드 조사 신청하기:</strong> 원하는 브랜드나 함께 탐색하고 싶은 인기 아이템을 자유롭게 신청해 주세요!
               </span>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 w-full md:w-auto">
               {isAdmin && (
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30 shrink-0">
                   관리자 모드
                 </span>
               )}
@@ -1194,19 +1203,20 @@ export function Finder({ initialFolder = "All Brands", navigationRequestId, onOp
               {permissions.finder.allowFolderCreate && (
                 <button
                   onClick={handleCreateNewBrandFolder}
-                  className="bg-violet-600 hover:bg-violet-700 text-white font-medium px-2.5 py-1 rounded shadow-sm text-xs flex items-center gap-1 transition-colors cursor-pointer"
-                  title="새 신청서 작성"
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-3 py-2 md:px-2.5 md:py-1 rounded-lg md:rounded shadow-sm text-xs md:text-[13px] flex items-center justify-center gap-1.5 transition-colors cursor-pointer w-full md:w-auto text-center"
+                  title="브랜드 조사 신청"
                 >
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>새 신청서 작성</span>
+                  <Plus className="w-3.5 h-3.5 shrink-0" />
+                  <span className="md:hidden font-semibold">브랜드 조사 신청</span>
+                  <span className="hidden md:inline">새 신청서 작성</span>
                 </button>
               )}
             </div>
           </div>
         )}
 
-        {/* 파일 뷰 영역 */}
-        <div className="flex-1 overflow-auto p-4">
+        {/* 파일 뷰 영역 (리스트 뷰 시 상하 여백 최적화) */}
+        <div className={`flex-1 overflow-auto ${viewMode === "list" ? "px-2.5 md:px-3 pt-1 pb-12 md:pb-4" : "p-3 md:p-4 pb-12 md:pb-4"}`}>
           {filteredFiles.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-slate-400 gap-2">
               <Search className="w-10 h-10 stroke-[1.5]" />
@@ -1215,15 +1225,15 @@ export function Finder({ initialFolder = "All Brands", navigationRequestId, onOp
           ) : viewMode === "list" ? (
             /* ──────── LIST VIEW ──────── */
             <div className="w-full">
-              {/* 리스트 헤더 */}
-              <div className="grid grid-cols-12 gap-2 px-3 py-1.5 text-[11px] font-semibold text-slate-400 dark:text-zinc-500 border-b border-slate-100 dark:border-zinc-800">
+              {/* 리스트 헤더 (상하 여백 컴팩트 조정) */}
+              <div className="grid grid-cols-12 gap-2 px-2.5 md:px-3 py-1 text-[11px] font-semibold text-slate-400 dark:text-zinc-500 border-b border-slate-100 dark:border-zinc-800">
                 <div className="col-span-6">Name</div>
                 <div className="col-span-2 text-right">Size</div>
                 <div className="col-span-2">Kind</div>
                 <div className="col-span-2">Date Modified</div>
               </div>
 
-              <div className="divide-y divide-slate-100/60 dark:divide-zinc-800/60">
+              <div className="divide-y divide-slate-100/60 dark:divide-zinc-800/60 pt-0.5">
                 {filteredFiles.map((file) => {
                   const isSelected = selectedItemId === file.id
                   return (
@@ -1231,7 +1241,7 @@ export function Finder({ initialFolder = "All Brands", navigationRequestId, onOp
                       key={file.id}
                       onClick={() => setSelectedItemId(file.id)}
                       onDoubleClick={() => handleItemClick(file)}
-                      className={`grid grid-cols-12 gap-2 items-center px-3 py-2 rounded-lg cursor-pointer transition-colors text-xs ${
+                      className={`grid grid-cols-12 gap-2 items-center px-2.5 md:px-3 py-1.5 rounded-lg cursor-pointer transition-colors text-xs ${
                         isSelected
                           ? "bg-blue-600 text-white"
                           : "text-slate-800 dark:text-zinc-200 hover:bg-slate-100/70 dark:hover:bg-zinc-800/60"

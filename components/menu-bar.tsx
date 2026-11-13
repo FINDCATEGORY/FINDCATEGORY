@@ -102,7 +102,7 @@ export function MenuBar({
   const appMenuItems = [
     { label: "로그인", action: () => onOpenApp?.("settings", "Settings", { settingsCategory: "로그인" }) },
     { label: "회원가입", action: () => onOpenApp?.("settings", "Settings", { settingsCategory: "회원가입" }) },
-    { label: "공지", action: () => onOpenApp?.("notes", "Notes") },
+    { label: "소식", action: () => onOpenApp?.("notes", "Notes") },
     { label: "설정", action: () => onOpenApp?.("settings", "Settings") },
   ]
 
@@ -120,7 +120,7 @@ export function MenuBar({
     { id: "finder", label: "Finder", tooltip: "브랜드영상보기", action: () => onOpenApp?.("finder", "Finder") },
     { id: "safari", label: "Safari", tooltip: "게시판", action: () => onOpenApp?.("safari", "Safari") },
     { id: "messages", label: "Messages", tooltip: "채팅", action: () => onOpenApp?.("messages", "Messages") },
-    { id: "notes", label: "Notes", tooltip: "공지", action: () => onOpenApp?.("notes", "Notes") },
+    { id: "notes", label: "Notes", tooltip: "소식", action: () => onOpenApp?.("notes", "Notes") },
     { id: "terminal", label: "Terminal", tooltip: "터미널", action: () => onOpenApp?.("terminal", "Terminal") },
   ]
 
@@ -190,7 +190,7 @@ export function MenuBar({
             <span className="absolute top-1.5 right-1.5 md:top-1 md:right-1 w-2 h-2 md:w-1.5 md:h-1.5 bg-blue-500 rounded-full ring-1 ring-white" />
           )}
         </button>
-        <span className="font-medium text-xs md:text-sm whitespace-nowrap">
+        <span className="font-bold tracking-tight text-[15px] md:text-sm whitespace-nowrap">
           <span className="hidden sm:inline">{formatDate(currentTime)} </span>
           <span>{formatTime(currentTime)}</span>
         </span>

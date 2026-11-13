@@ -135,36 +135,37 @@ export function Notes() {
   )
 
   return (
-    <div className="flex h-full bg-white dark:bg-zinc-950 text-slate-900 dark:text-zinc-100">
-      {/* Sidebar */}
-      <div className="w-72 border-r border-slate-200 dark:border-zinc-800 flex flex-col bg-white dark:bg-zinc-900/60">
-        <div className="p-4 border-b border-slate-200 dark:border-zinc-800 flex items-center justify-between">
-          <h2 className="font-semibold text-slate-900 dark:text-zinc-100">Notes</h2>
+    <div className="flex flex-col landscape:flex-row md:flex-row h-full bg-white dark:bg-zinc-950 text-slate-900 dark:text-zinc-100">
+      {/* Sidebar (모바일 세로에서는 상단 바, 모바일 가로/PC에서는 좌측 바) */}
+      <div className="w-full landscape:w-72 md:w-72 border-b landscape:border-b-0 landscape:border-r md:border-b-0 md:border-r border-slate-200 dark:border-zinc-800 flex flex-col bg-white dark:bg-zinc-900/60 shrink-0 z-10">
+        <div className="p-2.5 md:p-4 border-b border-slate-200 dark:border-zinc-800 flex items-center justify-between shrink-0">
+          <h2 className="font-semibold text-xs md:text-base text-slate-900 dark:text-zinc-100">Notes</h2>
           {isAdmin && (
             <div className="flex gap-1.5">
               <button
                 type="button"
                 onClick={handleAddNote}
-                className="p-1.5 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-lg transition-colors cursor-pointer"
+                className="p-1 md:p-1.5 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-lg transition-colors cursor-pointer"
                 title="새 메모 작성 (New Note)"
               >
-                <Plus className="w-5 h-5 text-slate-700 dark:text-zinc-300" />
+                <Plus className="w-4 h-4 md:w-5 md:h-5 text-slate-700 dark:text-zinc-300" />
               </button>
               {currentNote && (
                 <button
                   type="button"
                   onClick={handleDeleteNote}
-                  className="p-1.5 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-slate-700 hover:text-rose-600 dark:text-zinc-300 dark:hover:text-rose-400 rounded-lg transition-colors cursor-pointer"
+                  className="p-1 md:p-1.5 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-slate-700 hover:text-rose-600 dark:text-zinc-300 dark:hover:text-rose-400 rounded-lg transition-colors cursor-pointer"
                   title="메모 삭제 (Delete Note)"
                 >
-                  <Trash2 className="w-5 h-5" />
+                  <Trash2 className="w-4 h-4 md:w-5 md:h-5" />
                 </button>
               )}
             </div>
           )}
         </div>
 
-        <div className="p-3 border-b border-slate-200 dark:border-zinc-800">
+        {/* 검색창 (PC 및 모바일 가로에서만 표시) */}
+        <div className="hidden landscape:block md:block p-3 border-b border-slate-200 dark:border-zinc-800 shrink-0">
           <div className="relative">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
@@ -177,9 +178,10 @@ export function Notes() {
           </div>
         </div>
 
-        <div className="flex-1 overflow-auto bg-white dark:bg-zinc-950">
+        {/* 메모 리스트 (모바일 세로에서는 가로 탭 바, 모바일 가로/PC에서는 세로 스크롤) */}
+        <div className="flex flex-row landscape:flex-col md:flex-col overflow-x-auto landscape:overflow-y-auto md:overflow-y-auto p-1.5 gap-1.5 landscape:gap-0 md:gap-0 scrollbar-none shrink-0 max-h-16 landscape:max-h-none md:max-h-none bg-white dark:bg-zinc-950">
           {filteredNotes.length === 0 ? (
-            <div className="p-6 text-center text-xs text-slate-400 dark:text-zinc-500">
+            <div className="p-3 md:p-6 text-center text-xs text-slate-400 dark:text-zinc-500 whitespace-nowrap">
               등록된 메모가 없습니다.
             </div>
           ) : (
@@ -187,18 +189,18 @@ export function Notes() {
               <button
                 key={note.id}
                 type="button"
-                className={`w-full p-4 text-left border-b border-slate-100 dark:border-zinc-800/80 hover:bg-slate-50 dark:hover:bg-zinc-900 transition-colors cursor-pointer ${
-                  selectedNote === note.id ? "bg-slate-100 dark:bg-zinc-800/80" : ""
+                className={`p-2 landscape:p-4 md:p-4 text-left rounded-lg landscape:rounded-none md:rounded-none border landscape:border-0 md:border-0 landscape:border-b md:border-b border-slate-200 dark:border-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-900 transition-colors cursor-pointer shrink-0 whitespace-nowrap ${
+                  selectedNote === note.id ? "bg-blue-50 dark:bg-zinc-800/80 border-blue-400" : "bg-white dark:bg-zinc-900/40"
                 }`}
                 onClick={() => setSelectedNote(note.id)}
               >
-                <div className="font-semibold text-sm mb-1 text-slate-900 dark:text-zinc-100">
+                <div className="font-semibold text-xs md:text-sm text-slate-900 dark:text-zinc-100 truncate max-w-[120px] md:max-w-none">
                   {note.title}
                 </div>
-                <div className="text-xs text-slate-400 dark:text-zinc-500 mb-2">
+                <div className="hidden landscape:block md:block text-xs text-slate-400 dark:text-zinc-500 mb-2">
                   {note.date} • {note.folder}
                 </div>
-                <div className="text-xs text-slate-600 dark:text-zinc-400 line-clamp-2">
+                <div className="hidden landscape:block md:block text-xs text-slate-600 dark:text-zinc-400 line-clamp-2">
                   {note.content}
                 </div>
               </button>
@@ -207,8 +209,8 @@ export function Notes() {
         </div>
       </div>
 
-      {/* Editor */}
-      <div className="flex-1 p-8 overflow-auto bg-white dark:bg-zinc-950">
+      {/* Editor (모바일 세로에서는 하단 영역) */}
+      <div className="flex-1 p-4 md:p-8 overflow-y-auto min-h-0 bg-white dark:bg-zinc-950">
         {currentNote ? (
           <>
             {!isAdmin && (

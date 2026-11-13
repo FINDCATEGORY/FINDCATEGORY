@@ -55,6 +55,7 @@ import {
   getStoredNotificationTriggerSettings,
   saveNotificationTriggerSettings,
   NOTIFICATION_TRIGGER_SETTINGS_UPDATED_EVENT,
+  isNotificationTriggerEnabled,
 } from "@/lib/notification-triggers"
 import {
   getStoredAuth,
@@ -139,9 +140,10 @@ function MacOSToggle({ checked, onChange, disabled = false, label }: MacOSToggle
 export interface SettingsProps {
   initialCategory?: string
   navigationRequestId?: number
+  onClose?: () => void
 }
 
-export function Settings({ initialCategory, navigationRequestId }: SettingsProps = {}) {
+export function Settings({ initialCategory, navigationRequestId, onClose }: SettingsProps = {}) {
   const [selectedCategory, setSelectedCategory] = useState(initialCategory || "로그인")
   const { controls: systemControls, setSystemControls } = useSystemControls()
 
@@ -465,20 +467,35 @@ export function Settings({ initialCategory, navigationRequestId }: SettingsProps
     } catch {}
   }
 
+  // 로그인 성공 시 로그인 창 닫기 핸들러 (계정관리 화면으로 전환하지 않고 창 즉시 닫기)
+  const closeLoginWindow = () => {
+    setTimeout(() => {
+      if (onClose) {
+        onClose()
+      }
+      try {
+        window.dispatchEvent(
+          new CustomEvent("findcategory_close_app", { detail: { app: "settings" } })
+        )
+      } catch {}
+    }, 120)
+  }
+
   // 로그인 핸들러
   const handleLoginSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     setLoginError("")
 
     const trimmedLogin = loginEmail.trim()
-    const isAdminId = trimmedLogin.toLowerCase() === "admin"
+    const cleanLogin = trimmedLogin.toLowerCase()
+    const isAdminId =
+      cleanLogin === "admin" ||
+      cleanLogin === "admin@findcategory.co.kr" ||
+      cleanLogin === "gun" ||
+      cleanLogin === "gun@findcategory.co.kr"
 
     if (!trimmedLogin) {
-      setLoginError("이메일 계정 또는 관리자 아이디(admin)를 입력해 주세요.")
-      return
-    }
-    if (!isAdminId && !trimmedLogin.includes("@")) {
-      setLoginError("올바른 이메일 계정 또는 admin을 입력해 주세요.")
+      setLoginError("닉네임 또는 이메일 계정을 입력해 주세요.")
       return
     }
     if (!loginPassword) {
@@ -486,18 +503,81 @@ export function Settings({ initialCategory, navigationRequestId }: SettingsProps
       return
     }
 
-    const adminCheck = isUserAdmin(trimmedLogin)
+    const adminCheck = isUserAdmin(trimmedLogin) || isAdminId
 
-    // 1. 기존 등록된 로컬 계정과 매칭 확인
+    // 1. 관리자(admin, gun, gun@findcategory.co.kr) 로그인 시: 무조건 공식 gun@findcategory.co.kr 계정으로 일원화 접속
+    if (adminCheck) {
+      const gunAdminAccount: UserAccount = {
+        nickname: "gun",
+        email: "gun@findcategory.co.kr",
+        role: "시스템 관리자",
+        isAdmin: true,
+        bio: "FINDCATEGORY 시스템 관리자",
+        isRegistered: true,
+        avatarColor: "from-blue-600 via-indigo-600 to-purple-600",
+        createdAt: "2026. 11. 01",
+      }
+      setUserAccount(gunAdminAccount)
+      setIsLoggedIn(true)
+      setStoredAuth(gunAdminAccount, true)
+      playPopSound()
+      showNotification({
+        app: "Settings",
+        title: "관리자 로그인 성공",
+        message: "‘gun’ 시스템 관리자 계정으로 접속되었습니다.",
+        iconType: "settings",
+      })
+      setToastMessage("‘gun’ 시스템 관리자 계정(gun@findcategory.co.kr)으로 접속되었습니다.")
+      setTimeout(() => setToastMessage(""), 4000)
+      closeLoginWindow()
+      return
+    }
+
+    // 2. 전체 등록 회원 목록(managedUsers)에서 닉네임 또는 이메일 일치 회원 검색
+    try {
+      const allUsers = getStoredManagedUsers()
+      const matchedUser = allUsers.find(
+        (u) =>
+          u.nickname.toLowerCase() === cleanLogin ||
+          u.email.toLowerCase() === cleanLogin
+      )
+      if (matchedUser) {
+        const matchedAccount: UserAccount = {
+          nickname: matchedUser.nickname,
+          email: matchedUser.email,
+          role: matchedUser.role || "일반 회원",
+          isAdmin: matchedUser.isAdmin || false,
+          bio: matchedUser.bio || "비주얼 기반으로 브랜드 아카이브를 탐색하는 사용자",
+          isRegistered: true,
+          avatarColor: matchedUser.avatarColor || "from-blue-600 via-indigo-600 to-purple-600",
+          createdAt: matchedUser.createdAt,
+        }
+        setUserAccount(matchedAccount)
+        setIsLoggedIn(true)
+        setStoredAuth(matchedAccount, true)
+        playPopSound()
+        showNotification({
+          app: "Settings",
+          title: "로그인 성공",
+          message: `‘${matchedAccount.nickname}’님 환영합니다. 로그인되었습니다.`,
+          iconType: "settings",
+        })
+        setToastMessage(`‘${matchedAccount.nickname}’님 환영합니다. 로그인되었습니다.`)
+        setTimeout(() => setToastMessage(""), 4000)
+        closeLoginWindow()
+        return
+      }
+    } catch {}
+
+    // 3. 로컬 저장소(findcategory_user)에 저장된 기존 계정과 매칭 (닉네임 또는 이메일)
     try {
       const saved = localStorage.getItem("findcategory_user")
       if (saved) {
         const parsed: UserAccount = JSON.parse(saved)
-        if (parsed.email.toLowerCase() === trimmedLogin.toLowerCase()) {
-          if (adminCheck) {
-            parsed.isAdmin = true
-            parsed.role = "시스템 관리자"
-          }
+        if (
+          parsed.email.toLowerCase() === cleanLogin ||
+          parsed.nickname.toLowerCase() === cleanLogin
+        ) {
           setUserAccount(parsed)
           setIsLoggedIn(true)
           setStoredAuth(parsed, true)
@@ -505,35 +585,34 @@ export function Settings({ initialCategory, navigationRequestId }: SettingsProps
           showNotification({
             app: "Settings",
             title: "로그인 성공",
-            message: adminCheck
-              ? `‘${parsed.nickname}’ 관리자님 환영합니다.`
-              : `‘${parsed.nickname}’님 환영합니다. 로그인되었습니다.`,
+            message: `‘${parsed.nickname}’님 환영합니다. 로그인되었습니다.`,
             iconType: "settings",
           })
-          setToastMessage(
-            adminCheck
-              ? `‘${parsed.nickname}’ 관리자님 환영합니다.`
-              : `‘${parsed.nickname}’님 환영합니다. 로그인되었습니다.`,
-          )
+          setToastMessage(`‘${parsed.nickname}’님 환영합니다. 로그인되었습니다.`)
           setTimeout(() => setToastMessage(""), 4000)
-          setSelectedCategory("계정관리")
+          closeLoginWindow()
           return
         }
       }
     } catch {}
 
-    // 2. 신규 로그인 세션 생성 (admin / 관리자 계정은 관리자 권한 자동 부여)
-    const nicknameFromLogin = trimmedLogin.includes("@")
+    // 4. 신규 일반 회원 로그인 세션 생성 (닉네임/이메일 자동 대응)
+    const isEmailInput = trimmedLogin.includes("@")
+    const finalNickname = isEmailInput
       ? trimmedLogin.split("@")[0] || "사용자"
       : trimmedLogin
+    const finalEmail = isEmailInput
+      ? trimmedLogin
+      : `${trimmedLogin.replace(/\s+/g, "").toLowerCase()}@findcategory.com`
+
     const newAccount: UserAccount = {
-      nickname: isAdminId ? "admin" : adminCheck ? "gun" : nicknameFromLogin,
-      email: isAdminId ? "admin" : trimmedLogin,
-      role: adminCheck ? "시스템 관리자" : "사용자",
-      isAdmin: adminCheck,
-      bio: adminCheck ? "FINDCATEGORY 시스템 관리자" : "비주얼 기반으로 브랜드 아카이브를 탐색하는 사용자",
+      nickname: finalNickname,
+      email: finalEmail,
+      role: "일반 회원",
+      isAdmin: false,
+      bio: "비주얼 기반으로 브랜드 아카이브를 탐색하는 사용자",
       isRegistered: true,
-      avatarColor: "from-blue-600 via-indigo-600 to-purple-600",
+      avatarColor: "from-slate-600 to-zinc-700",
       createdAt: new Date().toLocaleDateString("ko-KR", { year: "numeric", month: "short" }),
     }
 
@@ -556,7 +635,7 @@ export function Settings({ initialCategory, navigationRequestId }: SettingsProps
         : `‘${newAccount.nickname}’님 환영합니다. 로그인되었습니다.`,
     )
     setTimeout(() => setToastMessage(""), 4000)
-    setSelectedCategory("계정관리")
+    closeLoginWindow()
   }
 
   // 로그아웃 핸들러
@@ -566,9 +645,11 @@ export function Settings({ initialCategory, navigationRequestId }: SettingsProps
     setLoginEmail("")
     setLoginPassword("")
     authLogout()
-    playPopSound()
-    setToastMessage("로그아웃되었습니다.")
-    setTimeout(() => setToastMessage(""), 4000)
+    if (isNotificationTriggerEnabled("logout")) {
+      playPopSound()
+      setToastMessage("로그아웃되었습니다.")
+      setTimeout(() => setToastMessage(""), 4000)
+    }
     setSelectedCategory("로그인")
   }
 
@@ -834,7 +915,7 @@ export function Settings({ initialCategory, navigationRequestId }: SettingsProps
                       계정 로그인
                     </h2>
                     <p className="text-[11px] text-slate-400 dark:text-zinc-500">
-                      이메일 계정(관리자는 admin)과 비밀번호를 입력해 주세요.
+                      닉네임 또는 이메일 계정(관리자는 admin)과 비밀번호를 입력해 주세요.
                     </p>
                   </div>
                 </div>
@@ -848,10 +929,10 @@ export function Settings({ initialCategory, navigationRequestId }: SettingsProps
                   </div>
                 )}
 
-                {/* 이메일 계정 / 관리자 아이디 */}
+                {/* 이메일 계정 / 관리자 아이디 / 닉네임 */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 items-center">
                   <label className="text-xs font-medium text-slate-700 dark:text-zinc-300">
-                    아이디 / 이메일 <span className="text-rose-500">*</span>
+                    닉네임 / 이메일 <span className="text-rose-500">*</span>
                   </label>
                   <div className="sm:col-span-2">
                     <input
@@ -859,7 +940,7 @@ export function Settings({ initialCategory, navigationRequestId }: SettingsProps
                       autoComplete="username"
                       value={loginEmail}
                       onChange={(e) => setLoginEmail(e.target.value)}
-                      placeholder="user@findcategory.com 또는 admin"
+                      placeholder="닉네임 또는 이메일 입력"
                       className="w-full px-3 py-1.5 text-xs md:text-sm bg-white dark:bg-zinc-800/80 border border-slate-200 dark:border-zinc-700 rounded-md text-slate-800 dark:text-zinc-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm"
                     />
                   </div>
@@ -1261,7 +1342,7 @@ export function Settings({ initialCategory, navigationRequestId }: SettingsProps
                           setNicknameChecked(false)
                           setNicknameMsg(null)
                         }}
-                        placeholder="예: 미니멀리스트"
+                        placeholder=""
                         className="flex-1 px-3 py-1.5 text-xs md:text-sm bg-white dark:bg-zinc-800/80 border border-slate-200 dark:border-zinc-700 rounded-md text-slate-800 dark:text-zinc-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm"
                       />
                       <button
@@ -1415,21 +1496,6 @@ export function Settings({ initialCategory, navigationRequestId }: SettingsProps
                   </div>
                 </div>
 
-                {/* 프로필 소개 / 취향 노트 */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 items-start pt-1">
-                  <label className="text-xs font-medium text-slate-700 dark:text-zinc-300 pt-1.5">
-                    한 줄 소개
-                  </label>
-                  <div className="sm:col-span-2">
-                    <textarea
-                      rows={2}
-                      value={formBio}
-                      onChange={(e) => setFormBio(e.target.value)}
-                      placeholder="관심 있는 브랜드나 선호하는 패션 스타일을 간단히 적어주세요."
-                      className="w-full px-3 py-1.5 text-xs md:text-sm bg-white dark:bg-zinc-800/80 border border-slate-200 dark:border-zinc-700 rounded-md text-slate-800 dark:text-zinc-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm resize-none"
-                    />
-                  </div>
-                </div>
 
                 {/* 폼 하단 버튼 바 */}
                 <div className="pt-3 border-t border-slate-100 dark:border-zinc-800/80 flex items-center justify-between">
@@ -2374,28 +2440,28 @@ export function Settings({ initialCategory, navigationRequestId }: SettingsProps
   }
 
   return (
-    <div className="flex h-full bg-slate-50 dark:bg-zinc-950 font-sans select-none overflow-hidden text-slate-800 dark:text-zinc-100 relative">
-      {/* ───────────────── 좌측 사이드바 ───────────────── */}
-      <div className="w-64 bg-slate-100/80 dark:bg-zinc-900/80 backdrop-blur-md border-r border-slate-200 dark:border-zinc-800 p-3 flex flex-col justify-between shrink-0 overflow-y-auto">
-        <div className="space-y-3">
+    <div className="flex flex-col landscape:flex-row md:flex-row h-full bg-slate-50 dark:bg-zinc-950 font-sans select-none overflow-hidden text-slate-800 dark:text-zinc-100 relative">
+      {/* ───────────────── 사이드바 (모바일 세로에서는 상단 바, 모바일 가로/PC에서는 좌측 바) ───────────────── */}
+      <div className="w-full landscape:w-64 md:w-64 bg-slate-100/90 dark:bg-zinc-900/90 backdrop-blur-md border-b landscape:border-b-0 landscape:border-r md:border-b-0 md:border-r border-slate-200 dark:border-zinc-800 p-2 landscape:p-3 md:p-3 flex flex-row landscape:flex-col md:flex-col justify-between shrink-0 overflow-x-auto landscape:overflow-x-visible md:overflow-x-visible items-center landscape:items-stretch md:items-stretch gap-2 scrollbar-none z-10">
+        <div className="flex flex-row landscape:flex-col md:flex-col items-center landscape:items-stretch md:items-stretch gap-1.5 landscape:space-y-3 md:space-y-3 shrink-0">
           {/* 상단: 비로그인 상태에서는 로그인 버튼, 로그인 시에는 유저 프로필 카드 */}
           {!isLoggedIn || !userAccount ? (
             <button
               onClick={() => setSelectedCategory("로그인")}
-              className={`w-full p-2.5 rounded-xl border transition-all text-left flex items-center gap-3 ${
+              className={`p-2 landscape:p-2.5 md:p-2.5 rounded-xl border transition-all text-left flex items-center gap-2 md:gap-3 shrink-0 cursor-pointer ${
                 selectedCategory === "로그인"
                   ? "bg-white dark:bg-zinc-800 border-blue-400 dark:border-blue-500 shadow-sm ring-2 ring-blue-500/20"
                   : "bg-white/60 dark:bg-zinc-800/40 border-slate-200/70 dark:border-zinc-700/60 hover:bg-white dark:hover:bg-zinc-800"
               }`}
             >
-              <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 border border-blue-200/50 flex items-center justify-center font-bold text-sm shadow-sm shrink-0">
-                <LogIn className="w-5 h-5 ml-0.5" />
+              <div className="w-7 h-7 md:w-10 md:h-10 rounded-full bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 border border-blue-200/50 flex items-center justify-center font-bold text-xs md:text-sm shadow-sm shrink-0">
+                <LogIn className="w-3.5 h-3.5 md:w-5 md:h-5 ml-0.5" />
               </div>
-              <div className="min-w-0 flex-1">
+              <div className="min-w-0">
                 <div className="font-semibold text-xs text-slate-800 dark:text-zinc-100 truncate">
                   로그인
                 </div>
-                <div className="text-[11px] text-blue-600 dark:text-blue-400 font-medium truncate">
+                <div className="hidden landscape:block md:block text-[11px] text-blue-600 dark:text-blue-400 font-medium truncate">
                   계정에 로그인하기
                 </div>
               </div>
@@ -2403,18 +2469,18 @@ export function Settings({ initialCategory, navigationRequestId }: SettingsProps
           ) : (
             <button
               onClick={() => setSelectedCategory("계정관리")}
-              className={`w-full p-2.5 rounded-xl border transition-all text-left flex items-center gap-3 ${
+              className={`p-2 landscape:p-2.5 md:p-2.5 rounded-xl border transition-all text-left flex items-center gap-2 md:gap-3 shrink-0 cursor-pointer ${
                 selectedCategory === "계정관리"
                   ? "bg-white dark:bg-zinc-800 border-blue-400 dark:border-blue-500 shadow-sm"
                   : "bg-white/60 dark:bg-zinc-800/40 border-slate-200/70 dark:border-zinc-700/60 hover:bg-white dark:hover:bg-zinc-800"
               }`}
             >
               <div
-                className={`w-10 h-10 rounded-full bg-gradient-to-br ${userAccount.avatarColor} text-white flex items-center justify-center font-bold text-sm shadow-sm shrink-0`}
+                className={`w-7 h-7 md:w-10 md:h-10 rounded-full bg-gradient-to-br ${userAccount.avatarColor} text-white flex items-center justify-center font-bold text-xs md:text-sm shadow-sm shrink-0`}
               >
                 {userAccount.nickname.charAt(0).toUpperCase()}
               </div>
-              <div className="min-w-0 flex-1">
+              <div className="min-w-0">
                 <div className="font-semibold text-xs text-slate-800 dark:text-zinc-100 truncate flex items-center gap-1.5">
                   <span>{userAccount.nickname}</span>
                   {userAccount.isAdmin && (
@@ -2423,15 +2489,15 @@ export function Settings({ initialCategory, navigationRequestId }: SettingsProps
                     </span>
                   )}
                 </div>
-                <div className="text-[11px] text-slate-500 dark:text-zinc-400 truncate">
+                <div className="hidden landscape:block md:block text-[11px] text-slate-500 dark:text-zinc-400 truncate">
                   {userAccount.isAdmin ? "시스템 관리자" : userAccount.email}
                 </div>
               </div>
             </button>
           )}
 
-          {/* 기존 설정 메뉴 리스트 */}
-          <div className="space-y-0.5">
+          {/* 기존 설정 메뉴 리스트 (모바일 세로에서는 가로 스크롤 탭 바) */}
+          <div className="flex flex-row landscape:flex-col md:flex-col items-center landscape:items-stretch md:items-stretch gap-1 landscape:space-y-0.5 md:space-y-0.5 shrink-0">
             {settingsCategories.map((category) => {
               // 관리자 전용 메뉴('회원관리', '알림')는 관리자에게만 노출
               if (category.adminOnly && (!isLoggedIn || !userAccount?.isAdmin)) {
@@ -2441,16 +2507,16 @@ export function Settings({ initialCategory, navigationRequestId }: SettingsProps
               return (
                 <button
                   key={category.label}
-                  className={`w-full flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-lg transition-colors text-left text-xs font-medium cursor-pointer ${
+                  className={`flex items-center justify-between gap-1.5 md:gap-2 px-2.5 py-1.5 rounded-lg transition-colors text-left text-xs font-medium cursor-pointer shrink-0 whitespace-nowrap ${
                     isSelected
                       ? "bg-blue-600 text-white font-semibold shadow-sm"
-                      : "text-slate-700 dark:text-zinc-300 hover:bg-slate-200/60 dark:hover:bg-zinc-800"
+                      : "text-slate-700 dark:text-zinc-300 hover:bg-slate-200/60 dark:hover:bg-zinc-800 bg-white/40 dark:bg-zinc-800/40 landscape:bg-transparent md:bg-transparent"
                   }`}
                   onClick={() => setSelectedCategory(category.label)}
                 >
-                  <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="flex items-center gap-1.5 md:gap-2.5 min-w-0">
                     <category.icon
-                      className={`w-4 h-4 shrink-0 ${isSelected ? "text-white" : "text-slate-500 dark:text-zinc-400"}`}
+                      className={`w-3.5 h-3.5 md:w-4 md:h-4 shrink-0 ${isSelected ? "text-white" : "text-slate-500 dark:text-zinc-400"}`}
                     />
                     <span className="truncate">{category.label}</span>
                   </div>
@@ -2471,14 +2537,14 @@ export function Settings({ initialCategory, navigationRequestId }: SettingsProps
           </div>
         </div>
 
-        {/* 사이드바 하단 시스템 버전 안내 */}
-        <div className="pt-3 border-t border-slate-200 dark:border-zinc-800 text-[10px] text-slate-400 dark:text-zinc-500 px-1">
+        {/* 사이드바 하단 시스템 버전 안내 (PC 및 모바일 가로에서만 표시) */}
+        <div className="hidden landscape:block md:block pt-3 border-t border-slate-200 dark:border-zinc-800 text-[10px] text-slate-400 dark:text-zinc-500 px-1">
           macOS Sequoia 15.1 • FINDCATEGORY
         </div>
       </div>
 
-      {/* ───────────────── 우측 컨텐츠 영역 ───────────────── */}
-      <div className="flex-1 p-6 md:p-8 overflow-y-auto">{renderContent()}</div>
+      {/* ───────────────── 컨텐츠 영역 (모바일 세로에서는 하단 영역) ───────────────── */}
+      <div className="flex-1 p-4 md:p-8 overflow-y-auto min-h-0 bg-white dark:bg-zinc-900">{renderContent()}</div>
 
       {/* ───────────────── 완료 모달 (macOS Alert Modal) ───────────────── */}
       {showSuccessModal && userAccount && (

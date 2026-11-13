@@ -515,46 +515,28 @@ export function Safari({
       <div className="flex-1 overflow-auto bg-white dark:bg-zinc-950">
         {isBoardPage ? (
           /* ───────────────── 자유게시판 화면 ───────────────── */
-          <div className="max-w-4xl mx-auto p-6 md:p-10 space-y-6 animate-in fade-in duration-200 select-text">
-            {/* 상단 헤더 */}
-            <div className="flex items-start justify-between flex-wrap gap-4 pb-4 border-b border-slate-200/80 dark:border-zinc-800">
-              <div>
-                <div className="flex items-center gap-2.5">
-                  <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-black dark:text-white">
-                    자유게시판
-                  </h1>
-                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300 border border-slate-200/70 dark:border-zinc-700">
-                    총 {posts.length}건
-                  </span>
-                </div>
-                <p className="text-xs md:text-sm text-slate-500 dark:text-zinc-400 mt-1">
-                  {isLoggedIn && user
-                    ? `${user.nickname}님으로 로그인됨 · 게시글 작성 및 본인 글 삭제가 가능합니다.`
-                    : "로그인한 회원은 자유롭게 게시글을 작성하고 본인 글을 삭제할 수 있습니다."}
-                </p>
+          <div className="max-w-4xl mx-auto p-4 md:p-10 space-y-5 md:space-y-6 animate-in fade-in duration-200 select-text">
+            {/* 상단 헤더: 자유게시판 타이틀과 우측 글쓰기 버튼 한 줄 정렬 */}
+            <div className="flex items-center justify-between gap-3 pb-4 border-b border-slate-200/80 dark:border-zinc-800">
+              <div className="flex items-center gap-2 md:gap-2.5">
+                <h1 className="text-xl md:text-3xl font-bold tracking-tight text-black dark:text-white">
+                  자유게시판
+                </h1>
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300 border border-slate-200/70 dark:border-zinc-700">
+                  총 {posts.length}건
+                </span>
               </div>
 
-              <div className="flex items-center gap-2">
-                {!isLoggedIn && (
-                  <button
-                    type="button"
-                    onClick={() => onOpenSettings?.("로그인")}
-                    className="px-3.5 py-2 rounded-xl text-xs font-medium border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-700 dark:text-zinc-200 transition-colors cursor-pointer"
-                  >
-                    로그인하기
-                  </button>
-                )}
-                {!isWritingPost && (
-                  <button
-                    type="button"
-                    onClick={handleStartWritePost}
-                    className="px-4 py-2 rounded-xl text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer"
-                  >
-                    <PenSquare className="w-3.5 h-3.5" />
-                    <span>글쓰기</span>
-                  </button>
-                )}
-              </div>
+              {!isWritingPost && (
+                <button
+                  type="button"
+                  onClick={handleStartWritePost}
+                  className="px-3.5 py-2 md:px-4 md:py-2 rounded-xl text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer shrink-0"
+                >
+                  <PenSquare className="w-3.5 h-3.5" />
+                  <span>글쓰기</span>
+                </button>
+              )}
             </div>
 
             {isWritingPost ? (

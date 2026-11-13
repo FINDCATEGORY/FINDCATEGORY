@@ -30,7 +30,7 @@ import { Terminal } from "./apps/terminal"
 import { Docker } from "./apps/docker"
 import { GitBash } from "./apps/git-bash"
 import { QuickTimePlayer } from "./apps/quicktime-player"
-import { MacOSFolderIcon, NotesIcon } from "./app-icons"
+import { MacOSFolderIcon, NotesIcon, LaunchpadIcon } from "./app-icons"
 import { ClockWidget } from "./widgets/clock-widget"
 import { CalendarWidget } from "./widgets/calendar-widget"
 import { AnimatedWallpaper } from "./animated-wallpaper"
@@ -268,14 +268,45 @@ export function MacOSDesktop({ onRestart }: MacOSDesktopProps = {}) {
 
     const isQuickTime = app === "quicktime"
     const isSafari = app === "safari"
+
+    const isClient = typeof window !== "undefined"
+    const winWidth = isClient ? window.innerWidth : 1200
+    const winHeight = isClient ? window.innerHeight : 800
+    const isMobile = winWidth < 768
+    const isLandscape = winWidth > winHeight
+    const isMobilePortrait = isMobile && !isLandscape
+
+    // 모바일 세로에서는 상단바(42px) 아래부터 독 위까지 화면 100% 핏
+    // 모바일 가로에서는 화면 너비에 맞게 시원하게 좌우 여백 정돈
+    const windowPosition = isMobilePortrait
+      ? { x: 0, y: 42 }
+      : isMobile && isLandscape
+      ? { x: 8, y: 42 }
+      : isQuickTime
+      ? { x: Math.max(20, Math.min(180, winWidth - 780)), y: 90 }
+      : {
+          x: Math.max(10, Math.min(100 + windows.length * 30, Math.max(10, winWidth - 920))),
+          y: Math.max(50, Math.min(80 + windows.length * 30, Math.max(50, winHeight - 640))),
+        }
+
+    const windowSize = isMobilePortrait
+      ? { width: winWidth, height: Math.max(320, winHeight - 42 - 76) }
+      : isMobile && isLandscape
+      ? { width: Math.max(300, winWidth - 16), height: Math.max(260, winHeight - 42 - 16) }
+      : isQuickTime
+      ? { width: Math.min(760, winWidth - 40), height: Math.min(500, winHeight - 100) }
+      : isSafari
+      ? { width: Math.min(940, winWidth - 40), height: Math.min(640, winHeight - 100) }
+      : { width: Math.min(900, winWidth - 40), height: Math.min(600, winHeight - 100) }
+
     const newWindow: WindowState = {
       id: `${app}-${Date.now()}`,
       app,
       title,
       isMinimized: false,
-      isMaximized: false,
-      position: isQuickTime ? { x: 180, y: 90 } : { x: 100 + windows.length * 30, y: 80 + windows.length * 30 },
-      size: isQuickTime ? { width: 760, height: 500 } : isSafari ? { width: 940, height: 640 } : { width: 900, height: 600 },
+      isMaximized: isMobilePortrait,
+      position: windowPosition,
+      size: windowSize,
       zIndex: highestZIndex + 1,
       videoUrl: options?.videoUrl,
       initialUrl: options?.initialUrl,
@@ -296,7 +327,17 @@ export function MacOSDesktop({ onRestart }: MacOSDesktopProps = {}) {
       openApp("settings", "Settings")
     }
     window.addEventListener(OPEN_SAFARI_LOGIN_EVENT, handleOpenLogin)
-    return () => window.removeEventListener(OPEN_SAFARI_LOGIN_EVENT, handleOpenLogin)
+    const handleCloseApp = (e: any) => {
+      const app = e.detail?.app as AppType
+      if (app) {
+        closeAppWindows(app)
+      }
+    }
+    window.addEventListener("findcategory_close_app", handleCloseApp)
+    return () => {
+      window.removeEventListener(OPEN_SAFARI_LOGIN_EVENT, handleOpenLogin)
+      window.removeEventListener("findcategory_close_app", handleCloseApp)
+    }
   }, [windows, highestZIndex])
 
   const closeWindow = (id: string) => {
@@ -381,7 +422,7 @@ export function MacOSDesktop({ onRestart }: MacOSDesktopProps = {}) {
         { label: "Finder", subLabel: "브랜드영상보기", action: () => openApp("finder", "Finder") },
         { label: "Safari", subLabel: "게시판", action: () => openApp("safari", "Safari") },
         { label: "Messages", subLabel: "채팅", action: () => openApp("messages", "Messages") },
-        { label: "Notes", subLabel: "공지", action: () => openApp("notes", "Notes") },
+        { label: "Notes", subLabel: "소식", action: () => openApp("notes", "Notes") },
         { label: "Terminal", subLabel: "터미널", action: () => openApp("terminal", "Terminal") },
       ],
     })
@@ -417,6 +458,7 @@ export function MacOSDesktop({ onRestart }: MacOSDesktopProps = {}) {
           <Settings
             initialCategory={windowObj?.settingsCategory}
             navigationRequestId={windowObj?.settingsCategoryNonce}
+            onClose={() => windowObj && closeWindow(windowObj.id)}
           />
         )
       case "calendar":
@@ -440,26 +482,34 @@ export function MacOSDesktop({ onRestart }: MacOSDesktopProps = {}) {
   }
 
   return (
-    <div className="h-screen w-screen overflow-hidden relative bg-gradient-to-br from-white via-slate-100 to-gray-200">
-      <div className="absolute inset-0 bg-gradient-to-br from-white via-[#f1f3f6] to-[#d8dce2]" />
+    <div className="h-screen w-screen overflow-hidden relative bg-gradient-to-br from-white via-slate-100 to-gray-200 dark:from-zinc-950 dark:via-[#121215] dark:to-[#09090b] transition-colors duration-500">
+      <div className="absolute inset-0 bg-gradient-to-br from-white via-[#f1f3f6] to-[#d8dce2] dark:from-zinc-950 dark:via-[#121215] dark:to-[#09090b] transition-colors duration-500" />
       <AnimatedWallpaper />
 
       <div className="absolute inset-0" onContextMenu={handleDesktopContextMenu}>
-        <div className="absolute top-20 md:top-32 right-4 md:right-8 flex flex-col gap-4 md:gap-6">
-          <DesktopIcon icon={MacOSFolderIcon} label="브랜드 영상" onDoubleClick={() => openApp("finder", "브랜드 영상")} />
-          <DesktopIcon icon={MacOSFolderIcon} label="브랜드 조사 신청" onDoubleClick={() => openApp("finder", "브랜드 조사 신청")} />
+        <div className="absolute top-20 md:top-32 right-3 md:right-6 flex flex-col gap-3.5 md:gap-4 items-center">
+          <DesktopIcon
+            icon={LaunchpadIcon}
+            label="Launchpad"
+            singleClick
+            onClick={() => setLaunchpadOpen(true)}
+            onDoubleClick={() => setLaunchpadOpen(true)}
+          />
+          <DesktopIcon icon={MacOSFolderIcon} label="영상" onDoubleClick={() => openApp("finder", "영상")} />
+          <DesktopIcon icon={MacOSFolderIcon} label="브랜드 신청" onDoubleClick={() => openApp("finder", "브랜드 신청")} />
         </div>
 
-        <div className="absolute bottom-32 md:bottom-40 left-4 md:left-8 flex flex-col gap-3 md:gap-4 items-start">
-          {/* 모바일 화면에서 하단 독 대신 시계 위로 이동 배치되는 노트(공지) 앱 (우측 아이콘과 동일한 DesktopIcon 컴포넌트 및 크기 적용) */}
-          <div className="md:hidden">
-            <DesktopIcon
-              icon={NotesIcon}
-              label="공지"
-              onDoubleClick={() => openApp("notes", "Notes")}
-              onClick={() => openApp("notes", "Notes")}
-            />
-          </div>
+        {/* 모바일 화면에서 우측 '영상' 폴더 아이콘과 수평(가로) 라인을 완벽히 일치시킨 소식 아이콘 */}
+        <div className="md:hidden absolute top-[186px] md:top-[236px] left-3 md:left-6">
+          <DesktopIcon
+            icon={NotesIcon}
+            label="소식"
+            onDoubleClick={() => openApp("notes", "Notes")}
+          />
+        </div>
+
+        {/* 좌측 하단 시계 및 캘린더 위젯 (모바일에서는 독에 가려지지 않도록 독 상단 위로 배치, PC에서는 독과 하단 맞춤) */}
+        <div className="absolute bottom-28 sm:bottom-32 md:bottom-6 left-4 md:left-8 flex flex-col gap-2.5 sm:gap-3 md:gap-4 items-start z-10">
           <ClockWidget />
           <CalendarWidget />
         </div>

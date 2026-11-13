@@ -6,6 +6,7 @@ export interface ManagedUser {
   isAdmin: boolean
   createdAt: string
   avatarColor: string
+  avatar?: string
   bio?: string
 }
 
@@ -21,6 +22,7 @@ export const INITIAL_MANAGED_USERS: ManagedUser[] = [
     isAdmin: true,
     createdAt: "2026. 11. 01",
     avatarColor: "from-blue-600 via-indigo-600 to-purple-600",
+    avatar: "G",
     bio: "FINDCATEGORY 시스템 관리자",
   },
   {
@@ -31,6 +33,7 @@ export const INITIAL_MANAGED_USERS: ManagedUser[] = [
     isAdmin: false,
     createdAt: "2026. 11. 05",
     avatarColor: "from-emerald-500 to-teal-700",
+    avatar: "🎨",
     bio: "아웃도어 & 테크웨어 큐레이션",
   },
   {
@@ -41,6 +44,7 @@ export const INITIAL_MANAGED_USERS: ManagedUser[] = [
     isAdmin: false,
     createdAt: "2026. 11. 06",
     avatarColor: "from-rose-500 to-pink-600",
+    avatar: "🏔️",
     bio: "북유럽 미니멀 브랜드 분석",
   },
   {
@@ -51,6 +55,7 @@ export const INITIAL_MANAGED_USERS: ManagedUser[] = [
     isAdmin: false,
     createdAt: "2026. 11. 07",
     avatarColor: "from-amber-500 to-orange-600",
+    avatar: "🧥",
     bio: "기능성 의류 및 테크웨어 아카이빙",
   },
   {
@@ -61,15 +66,39 @@ export const INITIAL_MANAGED_USERS: ManagedUser[] = [
     isAdmin: false,
     createdAt: "2026. 11. 08",
     avatarColor: "from-cyan-500 to-blue-600",
+    avatar: "👟",
     bio: "글로벌 패션 트렌드 리서치",
   },
 ]
 
 function normalizeManagedUsers(users: ManagedUser[]): ManagedUser[] {
-  const migrated = users.map((u) => {
-    if (u.nickname === "CHO" || u.email === "cho@findcategory.co.kr" || u.id === "usr-admin-1") {
+  // 기존의 별도 'admin', 'admin@findcategory.co.kr' 관리자 계정은 완전히 삭제하고, gun@findcategory.co.kr로 단일 통합
+  const filtered = users.filter((u) => {
+    if (!u || !u.email) return false
+    const lowerEmail = u.email.trim().toLowerCase()
+    const lowerNick = (u.nickname || "").trim().toLowerCase()
+    // 기존 admin 및 admin@findcategory.co.kr 더미 계정 완전 삭제
+    if (lowerEmail === "admin" || lowerEmail === "admin@findcategory.co.kr") {
+      return false
+    }
+    if (lowerNick === "admin" && lowerEmail !== "gun@findcategory.co.kr") {
+      return false
+    }
+    return true
+  })
+
+  const migrated = filtered.map((u) => {
+    const lowerEmail = u.email.trim().toLowerCase()
+    const lowerNick = (u.nickname || "").trim().toLowerCase()
+    if (
+      lowerNick === "cho" ||
+      lowerEmail === "cho@findcategory.co.kr" ||
+      lowerEmail === "gun@findcategory.co.kr" ||
+      u.id === "usr-admin-1"
+    ) {
       return {
         ...u,
+        id: "usr-admin-1",
         nickname: "gun",
         email: "gun@findcategory.co.kr",
         role: "시스템 관리자",
@@ -80,6 +109,12 @@ function normalizeManagedUsers(users: ManagedUser[]): ManagedUser[] {
     }
     return u
   })
+
+  // gun 관리자 계정이 목록에 없으면 최상단에 보장 추가
+  const hasGun = migrated.some((u) => u.email.toLowerCase() === "gun@findcategory.co.kr")
+  if (!hasGun) {
+    migrated.unshift(INITIAL_MANAGED_USERS[0])
+  }
 
   const uniqueUsers: ManagedUser[] = []
   const seenEmails = new Set<string>()

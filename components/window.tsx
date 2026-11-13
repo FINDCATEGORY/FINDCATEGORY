@@ -216,14 +216,29 @@ export function Window({
       className={`absolute macos-window-shadow rounded-lg overflow-hidden bg-white dark:bg-zinc-950 transition-opacity duration-200 ${
         isAnimating ? "animate-scale-in opacity-0" : "opacity-100"
       } ${isDragging ? "cursor-grabbing" : ""}`}
-      style={{
-        left: position.x,
-        top: position.y,
-        width: size.width,
-        height: size.height,
-        zIndex,
-        willChange: isDragging || isResizing ? "transform, width, height" : "auto",
-      }}
+      style={
+        isMaximized
+          ? {
+              left: 0,
+              top: typeof window !== "undefined" && window.innerWidth < 768 ? 42 : 28,
+              width: "100vw",
+              height:
+                typeof window !== "undefined" && window.innerWidth < 768
+                  ? "calc(100% - 42px - 104px)"
+                  : "calc(100% - 28px)",
+              zIndex,
+            }
+          : {
+              left: typeof window !== "undefined" && window.innerWidth < 768 && window.innerWidth <= window.innerHeight ? 0 : position.x,
+              top: typeof window !== "undefined" && window.innerWidth < 768 && window.innerWidth <= window.innerHeight ? 42 : position.y,
+              width: typeof window !== "undefined" && window.innerWidth < 768 && window.innerWidth <= window.innerHeight ? "100vw" : Math.min(size.width, typeof window !== "undefined" ? window.innerWidth : size.width),
+              height: typeof window !== "undefined" && window.innerWidth < 768 && window.innerWidth <= window.innerHeight ? "calc(100% - 42px - 104px)" : size.height,
+              maxWidth: "100vw",
+              maxHeight: "calc(100% - 42px)",
+              zIndex,
+              willChange: isDragging || isResizing ? "transform, width, height" : "auto",
+            }
+      }
       onMouseDown={() => onFocus()}
       onMouseEnter={() => setShowControls(true)}
       onMouseLeave={() => setShowControls(false)}
@@ -234,30 +249,27 @@ export function Window({
         onMouseDown={handleTitleBarMouseDown}
         onDoubleClick={onMaximize}
       >
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           <button
-            className={`w-3 h-3 rounded-full bg-[#FF5F57] hover:bg-[#FF5F57]/80 transition-all flex items-center justify-center ${
-              showControls ? "opacity-100" : "opacity-60"
-            }`}
+            className="w-[18px] h-[18px] rounded-full bg-[#FF5F57] hover:bg-[#FF5F57]/80 active:scale-95 transition-all flex items-center justify-center cursor-pointer shadow-xs"
             onClick={onClose}
+            title="닫기"
           >
-            {showControls && <span className="text-[8px] text-red-900">✕</span>}
+            <span className="text-[10px] text-red-950 font-bold leading-none select-none">✕</span>
           </button>
           <button
-            className={`w-3 h-3 rounded-full bg-[#FEBC2E] hover:bg-[#FEBC2E]/80 transition-all flex items-center justify-center ${
-              showControls ? "opacity-100" : "opacity-60"
-            }`}
+            className="w-[18px] h-[18px] rounded-full bg-[#FEBC2E] hover:bg-[#FEBC2E]/80 active:scale-95 transition-all flex items-center justify-center cursor-pointer shadow-xs"
             onClick={onMinimize}
+            title="최소화"
           >
-            {showControls && <Minimize2 className="w-2 h-2 text-yellow-900" />}
+            <Minimize2 className="w-2.5 h-2.5 text-yellow-950" />
           </button>
           <button
-            className={`w-3 h-3 rounded-full bg-[#28C840] hover:bg-[#28C840]/80 transition-all flex items-center justify-center ${
-              showControls ? "opacity-100" : "opacity-60"
-            }`}
+            className="w-[18px] h-[18px] rounded-full bg-[#28C840] hover:bg-[#28C840]/80 active:scale-95 transition-all flex items-center justify-center cursor-pointer shadow-xs"
             onClick={onMaximize}
+            title="최대화"
           >
-            {showControls && <Maximize2 className="w-2 h-2 text-green-900" />}
+            <Maximize2 className="w-2.5 h-2.5 text-green-950" />
           </button>
         </div>
         <div className="absolute left-1/2 -translate-x-1/2 text-sm font-medium text-gray-700 dark:text-zinc-200">{title}</div>

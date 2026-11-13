@@ -30,9 +30,8 @@ export const OPEN_SAFARI_LOGIN_EVENT = "findcategory_open_safari_login"
 
 export const ADMIN_EMAILS = [
   "admin",
-  "admin@findcategory.co.kr",
+  "gun",
   "gun@findcategory.co.kr",
-  "cho@findcategory.co.kr",
 ]
 
 /**
@@ -72,6 +71,26 @@ export function getStoredAuth(): AuthState {
     }
 
     const parsed: AuthUser = JSON.parse(savedUser)
+
+    // 기존 admin 및 레거시 관리자 계정은 공식 gun@findcategory.co.kr 계정으로 자동 마이그레이션 및 동기화
+    const lowerEmail = (parsed.email || "").toLowerCase()
+    const lowerNick = (parsed.nickname || "").toLowerCase()
+    if (
+      lowerEmail === "admin" ||
+      lowerEmail === "admin@findcategory.co.kr" ||
+      lowerEmail === "cho@findcategory.co.kr" ||
+      lowerNick === "admin" ||
+      lowerEmail === "gun@findcategory.co.kr"
+    ) {
+      parsed.email = "gun@findcategory.co.kr"
+      parsed.nickname = "gun"
+      parsed.role = "시스템 관리자"
+      parsed.isAdmin = true
+      parsed.bio = "FINDCATEGORY 시스템 관리자"
+      parsed.avatarColor = "from-blue-600 via-indigo-600 to-purple-600"
+      localStorage.setItem(AUTH_USER_STORAGE_KEY, JSON.stringify(parsed))
+    }
+
     const adminCheck = isUserAdmin(parsed.email) || parsed.isAdmin === true
 
     if (adminCheck) {
@@ -80,8 +99,10 @@ export function getStoredAuth(): AuthState {
         isLoggedIn: true,
         user: {
           ...parsed,
+          email: "gun@findcategory.co.kr",
+          nickname: "gun",
           isAdmin: true,
-          role: parsed.role || "시스템 관리자",
+          role: "시스템 관리자",
         },
       }
     }
@@ -116,8 +137,10 @@ export function setStoredAuth(user: AuthUser | null, isLoggedIn: boolean): void 
       const admin = isUserAdmin(user.email) || user.isAdmin === true
       const normalizedUser: AuthUser = {
         ...user,
+        email: admin ? "gun@findcategory.co.kr" : user.email,
+        nickname: admin ? "gun" : user.nickname,
         isAdmin: admin,
-        role: admin ? (user.role || "시스템 관리자") : (user.role || "일반 회원"),
+        role: admin ? "시스템 관리자" : (user.role || "일반 회원"),
         isRegistered: true,
       }
       localStorage.setItem(AUTH_USER_STORAGE_KEY, JSON.stringify(normalizedUser))
@@ -151,6 +174,7 @@ export function logout(): void {
     title: "로그아웃 완료",
     message: "안전하게 로그아웃되었습니다. 비회원 게스트 모드로 전환됩니다.",
     iconType: "findcategory",
+    triggerId: "logout",
   })
 }
 

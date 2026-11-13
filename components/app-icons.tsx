@@ -1,7 +1,7 @@
 export const FinderIcon = () => (
-  <div className="w-full h-full rounded-[22%] overflow-hidden">
+  <div className="w-full h-full rounded-[22%] overflow-hidden bg-[#2693fa]">
     <img
-      src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/images-GffQFvnmGS4oNDht4LFcZ2BqkEsK2D.jpg"
+      src="/finder-icon.png"
       alt="Finder"
       className="w-full h-full object-cover"
     />
@@ -40,8 +40,8 @@ export const SoundIcon = () => (
 export const MusicIcon = SoundIcon
 
 
-export const NotesIcon = () => (
-  <div className="w-full h-full rounded-[22%] shadow-lg overflow-hidden">
+export const NotesIcon = ({ className }: { className?: string }) => (
+  <div className={`w-full h-full aspect-square rounded-[22%] shadow-lg overflow-hidden shrink-0 ${className || ""}`}>
     <img
       src="/notes-icon.png"
       alt="Notes"
@@ -53,7 +53,7 @@ export const NotesIcon = () => (
 export const TerminalIcon = () => (
   <div className="w-full h-full rounded-[22%] overflow-hidden">
     <img
-      src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/terminal-2021-06-03-cP8LONJhjquJOgYKNSOIWIy2pZuqxT.webp"
+      src="/terminal-icon.png"
       alt="Terminal"
       className="w-full h-full object-cover"
     />
@@ -63,25 +63,31 @@ export const TerminalIcon = () => (
 export const SettingsIcon = () => (
   <div className="w-full h-full rounded-[22%] overflow-hidden">
     <img
-      src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/2b78f13e-cbc8-4e7f-95ad-c00d7c135305-cover-gvYiSJ6pKiss5jkFyGibVGT51FcY3N.png"
+      src="/settings-icon.png"
       alt="Settings"
       className="w-full h-full object-cover"
     />
   </div>
 )
 
-export const LaunchpadIcon = () => (
-  <div className="w-full h-full rounded-[22%] bg-gradient-to-br from-gray-600 to-gray-800 flex items-center justify-center p-2 shadow-lg">
-    <div className="grid grid-cols-3 gap-1 w-full h-full">
-      {[...Array(9)].map((_, i) => (
-        <div key={i} className="bg-white rounded-sm" />
-      ))}
-    </div>
+export const LaunchpadIcon = ({ className }: { className?: string }) => (
+  <div className={`w-[50px] h-[50px] rounded-[22%] bg-gradient-to-br from-[#2a303c] via-[#1e232e] to-[#141820] flex items-center justify-center p-2 overflow-hidden shadow-md select-none shrink-0 ${className || ""}`}>
+    <svg viewBox="0 0 100 100" className="w-full h-full" fill="none">
+      <circle cx="26" cy="26" r="9.5" fill="white" />
+      <circle cx="50" cy="26" r="9.5" fill="white" />
+      <circle cx="74" cy="26" r="9.5" fill="white" />
+      <circle cx="26" cy="50" r="9.5" fill="white" />
+      <circle cx="50" cy="50" r="9.5" fill="white" />
+      <circle cx="74" cy="50" r="9.5" fill="white" />
+      <circle cx="26" cy="74" r="9.5" fill="white" />
+      <circle cx="50" cy="74" r="9.5" fill="white" />
+      <circle cx="74" cy="74" r="9.5" fill="white" />
+    </svg>
   </div>
 )
 
 export const MacOSFolderIcon = ({ className }: { className?: string }) => (
-  <div className={`w-full h-full flex items-center justify-center select-none ${className || ""}`}>
+  <div className={`macos-folder w-[64px] h-[54px] flex items-center justify-center select-none shrink-0 ${className || ""}`}>
     <img
       src="/macos-folder.png"
       alt="macOS Folder"
