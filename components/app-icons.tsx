@@ -41,9 +41,9 @@ export const MusicIcon = SoundIcon
 
 
 export const NotesIcon = () => (
-  <div className="w-full h-full rounded-[22%] overflow-hidden">
+  <div className="w-full h-full rounded-[22%] shadow-lg overflow-hidden">
     <img
-      src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/notes_macos_bigsur_icon_189901-y0UlhiIg1eRRO2QrupDcgrpio0AqcE.png"
+      src="/notes-icon.png"
       alt="Notes"
       className="w-full h-full object-cover"
     />

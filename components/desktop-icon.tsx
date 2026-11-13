@@ -38,18 +38,21 @@ export function DesktopIcon({ icon, label, onDoubleClick, onClick }: DesktopIcon
 
   return (
     <button
-      className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors ${isSelected ? "bg-blue-500/30" : "hover:bg-white/20"
+      type="button"
+      className={`flex flex-col items-center gap-1.5 p-2 rounded-lg transition-colors cursor-pointer focus:outline-none select-none ${isSelected ? "bg-blue-500/30" : "hover:bg-white/20"
         }`}
       onClick={handleClick}
     >
       {IconComponent ? (
-        <div className="w-16 h-16">
+        <div className="w-16 h-16 shrink-0 flex items-center justify-center">
           <IconComponent />
         </div>
       ) : (
         <div className="text-5xl">{typeof icon === "string" ? icon : null}</div>
       )}
-      <span className="text-xs font-medium text-white drop-shadow-lg text-center">{label}</span>
+      <span className="text-xs font-medium text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] text-center leading-tight">
+        {label}
+      </span>
     </button>
   )
 }
