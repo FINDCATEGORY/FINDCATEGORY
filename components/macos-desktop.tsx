@@ -509,7 +509,14 @@ export function MacOSDesktop({ onRestart }: MacOSDesktopProps = {}) {
         openApps={windows.map((w) => w.app)}
       />
 
-      {spotlightOpen && <Spotlight onClose={() => setSpotlightOpen(false)} onOpenApp={openApp} />}
+      {spotlightOpen && (
+        <Spotlight
+          onClose={() => setSpotlightOpen(false)}
+          onOpenApp={openApp}
+          onLaunchpadClick={() => setLaunchpadOpen(true)}
+          onControlCenterClick={() => setControlCenterOpen(true)}
+        />
+      )}
 
       {contextMenu && (
         <ContextMenu
