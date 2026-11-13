@@ -450,7 +450,7 @@ export function MacOSDesktop({ onRestart }: MacOSDesktopProps = {}) {
           <DesktopIcon icon={MacOSFolderIcon} label="브랜드 조사 신청" onDoubleClick={() => openApp("finder", "브랜드 조사 신청")} />
         </div>
 
-        <div className="absolute bottom-20 md:bottom-32 left-4 md:left-8 flex flex-col gap-3 md:gap-4 items-start">
+        <div className="absolute bottom-32 md:bottom-40 left-4 md:left-8 flex flex-col gap-3 md:gap-4 items-start">
           {/* 모바일 화면에서 하단 독 대신 시계 위로 이동 배치되는 노트(공지) 앱 (우측 아이콘과 동일한 DesktopIcon 컴포넌트 및 크기 적용) */}
           <div className="md:hidden">
             <DesktopIcon
